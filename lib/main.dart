@@ -61,7 +61,6 @@ class FlashAnzanApp extends StatelessWidget {
           primary: Color(0xFF3B82F6),
           secondary: Color(0xFFF59E0B),
           surface: Color(0xFF1A1D2E),
-          background: Color(0xFF0F1117),
         ),
         fontFamily: 'Courier', // Will fall back to system monospace if needed
         useMaterial3: true,

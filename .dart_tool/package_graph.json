@@ -22,6 +22,14 @@
       ]
     },
     {
+      "name": "flutter_tts",
+      "version": "4.2.5",
+      "dependencies": [
+        "flutter",
+        "flutter_web_plugins"
+      ]
+    },
+    {
       "name": "msix",
       "version": "3.18.0",
       "dependencies": [
@@ -103,14 +111,6 @@
       ]
     },
     {
-      "name": "flutter_tts",
-      "version": "4.2.5",
-      "dependencies": [
-        "flutter",
-        "flutter_web_plugins"
-      ]
-    },
-    {
       "name": "cupertino_icons",
       "version": "1.0.9",
       "dependencies": []
@@ -125,6 +125,13 @@
         "meta",
         "sky_engine",
         "vector_math"
+      ]
+    },
+    {
+      "name": "flutter_web_plugins",
+      "version": "0.0.0",
+      "dependencies": [
+        "flutter"
       ]
     },
     {
@@ -391,13 +398,6 @@
         "flutter",
         "meta",
         "shared_preferences_platform_interface"
-      ]
-    },
-    {
-      "name": "flutter_web_plugins",
-      "version": "0.0.0",
-      "dependencies": [
-        "flutter"
       ]
     },
     {

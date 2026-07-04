@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../models/game_settings.dart';
+import 'home_screen.dart';
 import 'play_screen.dart';
 import 'settings_screen.dart';
-import 'history_screen.dart';
-import 'profile_screen.dart';
 import '../services/storage_service.dart';
-import '../utils/responsive.dart';
+import 'history_screen.dart';
+import 'beads_screen.dart';
+import 'adventure_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -25,19 +26,6 @@ class _AppShellState extends State<AppShell> {
     _settings = StorageService.loadSettings();
   }
 
-  void _onTabTapped(int index) {
-    if (_isPlaying) return; // Block navigation during play
-    setState(() {
-      _currentIndex = index;
-    });
-  }
-
-  void _onPlayingStateChanged(bool isPlaying) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) setState(() => _isPlaying = isPlaying);
-    });
-  }
-
   void _updateSettings(GameSettings newSettings) {
     setState(() {
       _settings = newSettings;
@@ -45,48 +33,75 @@ class _AppShellState extends State<AppShell> {
     StorageService.saveSettings(newSettings);
   }
 
-  List<Widget> _screens() {
-    return [
-      PlayScreen(settings: _settings, onPlayingStateChanged: _onPlayingStateChanged),
-      SettingsScreen(settings: _settings, onSettingsChanged: _updateSettings),
-      HistoryScreen(key: UniqueKey()),
-      const ProfileScreen(),
-    ];
+  void _onPlayingStateChanged(bool isPlaying) {
+    setState(() {
+      _isPlaying = isPlaying;
+    });
+  }
+
+  void _navigate(int index) {
+    if (_isPlaying) return;
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  void _goHome() {
+    _navigate(0);
+  }
+
+  Widget _buildCurrentScreen() {
+    switch (_currentIndex) {
+      case 0:
+        return HomeScreen(
+          settings: _settings,
+          onAdventureTap: () => _navigate(4),
+          onCalculationTap: () => _navigate(1),
+          onBeadsTap: () => _navigate(5),
+          onHistoryTap: () => _navigate(3),
+          onSettingsTap: () => _navigate(2),
+        );
+      case 1:
+        return PlayScreen(
+          settings: _settings,
+          onPlayingStateChanged: _onPlayingStateChanged,
+          onBack: _goHome,
+        );
+      case 2:
+        return SettingsScreen(
+          settings: _settings,
+          onSettingsChanged: _updateSettings,
+          onBack: _goHome,
+        );
+      case 3:
+        return HistoryScreen(
+          onBack: _goHome,
+        );
+      case 4:
+        return AdventureScreen(
+          onBack: _goHome,
+        );
+      case 5:
+        return BeadsScreen(
+          onBack: _goHome,
+        );
+      default:
+        return HomeScreen(
+          settings: _settings,
+          onAdventureTap: () => _navigate(4),
+          onCalculationTap: () => _navigate(1),
+          onBeadsTap: () => _navigate(5),
+          onHistoryTap: () => _navigate(3),
+          onSettingsTap: () => _navigate(2),
+        );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF0F1117),
-      body: SafeArea(
-        child: Row(
-          children: [
-            NavigationRail(
-              backgroundColor: const Color(0xFF1A1D2E),
-              selectedIndex: _currentIndex,
-              onDestinationSelected: _onTabTapped,
-              selectedIconTheme: const IconThemeData(color: Colors.amber),
-              unselectedIconTheme: IconThemeData(color: _isPlaying ? Colors.grey.withOpacity(0.3) : Colors.grey),
-              selectedLabelTextStyle: const TextStyle(color: Colors.amber),
-              unselectedLabelTextStyle: TextStyle(color: _isPlaying ? Colors.grey.withOpacity(0.3) : Colors.grey),
-              labelType: NavigationRailLabelType.all,
-              destinations: const [
-                NavigationRailDestination(icon: Icon(Icons.play_circle_fill), label: Text('Play')),
-                NavigationRailDestination(icon: Icon(Icons.settings), label: Text('Settings')),
-                NavigationRailDestination(icon: Icon(Icons.history), label: Text('History')),
-                NavigationRailDestination(icon: Icon(Icons.person), label: Text('Profile')),
-              ],
-            ),
-            const VerticalDivider(thickness: 1, width: 1, color: Color(0xFF2E3150)),
-            Expanded(
-              child: IndexedStack(
-                index: _currentIndex,
-                children: _screens(),
-              ),
-            ),
-          ],
-        ),
-      ),
+      body: _buildCurrentScreen(),
     );
   }
 }

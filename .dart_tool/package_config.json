@@ -111,7 +111,7 @@
     },
     {
       "name": "flutter_tts",
-      "rootUri": "file:///C:/Users/yelin/AppData/Local/Pub/Cache/hosted/pub.dev/flutter_tts-4.2.5",
+      "rootUri": "../packages/flutter_tts",
       "packageUri": "lib/",
       "languageVersion": "3.4"
     },

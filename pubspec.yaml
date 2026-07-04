@@ -52,6 +52,10 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   msix: ^3.18.0
 
+dependency_overrides:
+  flutter_tts:
+    path: packages/flutter_tts
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 

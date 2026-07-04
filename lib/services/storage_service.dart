@@ -8,6 +8,7 @@ class StorageService {
   static const String _keySpeed = 'settings_speed';
   static const String _keyMode = 'settings_mode';
   static const String _keyVoiceGender = 'settings_voice_gender';
+  static const String _keyCharacter = 'settings_character';
 
   static const String _keyUsername = 'profile_username';
   static const String _keyAge = 'profile_age';
@@ -48,6 +49,7 @@ class StorageService {
     final speedIndex = _prefs.getInt(_keySpeed) ?? GameSettings.defaultSettings.speed.index;
     final modeIndex = _prefs.getInt(_keyMode) ?? GameSettings.defaultSettings.mode.index;
     final voiceIndex = _prefs.getInt(_keyVoiceGender) ?? GameSettings.defaultSettings.voiceGender.index;
+    final characterIndex = _prefs.getInt(_keyCharacter) ?? GameSettings.defaultSettings.character.index;
 
     return GameSettings(
       digits: digits,
@@ -55,6 +57,7 @@ class StorageService {
       speed: GameSpeed.values[speedIndex],
       mode: GameMode.values[modeIndex],
       voiceGender: TtsVoiceGender.values[voiceIndex],
+      character: CharacterGender.values[characterIndex],
     );
   }
 
@@ -64,6 +67,7 @@ class StorageService {
     await _prefs.setInt(_keySpeed, settings.speed.index);
     await _prefs.setInt(_keyMode, settings.mode.index);
     await _prefs.setInt(_keyVoiceGender, settings.voiceGender.index);
+    await _prefs.setInt(_keyCharacter, settings.character.index);
   }
 
   static String loadUsername() => _prefs.getString(_keyUsername) ?? "Alex";

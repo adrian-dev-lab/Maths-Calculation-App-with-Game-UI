@@ -1,17 +1,18 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import '../models/game_settings.dart';
 import '../models/history_record.dart';
 import '../services/database_service.dart';
 import '../services/storage_service.dart';
+import '../services/tts_service.dart';
 
 class PlayScreen extends StatefulWidget {
   final GameSettings settings;
   final ValueChanged<bool>? onPlayingStateChanged;
+  final VoidCallback onBack;
 
-  const PlayScreen({super.key, required this.settings, this.onPlayingStateChanged});
+  const PlayScreen({super.key, required this.settings, this.onPlayingStateChanged, required this.onBack});
 
   @override
   State<PlayScreen> createState() => _PlayScreenState();
@@ -27,7 +28,7 @@ class _PlayScreenState extends State<PlayScreen> {
   int _answer = 0;
   bool _isAnswerRevealed = false;
   Timer? _timer;
-  final FlutterTts _tts = FlutterTts();
+  final _tts = TtsService();
 
   final Map<GameSpeed, int> _speedMs = {
     GameSpeed.ultraFast: 500,
@@ -48,38 +49,10 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   Future<void> _initTts() async {
-    await _tts.setLanguage("en-US");
-    await _setupVoice();
-    // default normal rate
-    await _tts.setSpeechRate(0.5);
-    await _tts.setVolume(1.0);
+    await _tts.init();
+    await _tts.setupVoice(widget.settings.voiceGender);
   }
 
-  Future<void> _setupVoice() async {
-    try {
-      final voices = await _tts.getVoices;
-      if (voices != null) {
-        for (var v in voices) {
-          final name = (v['name'] as String).toLowerCase();
-          if (widget.settings.voiceGender == TtsVoiceGender.female) {
-            if (name.contains('zira') || name.contains('samantha') || name.contains('female')) {
-              await _tts.setVoice({"name": v["name"], "locale": v["locale"]});
-              break;
-            }
-          } else {
-            if (!name.contains('female') && !name.contains('zira') && !name.contains('samantha')) {
-              if (name.contains('david') || name.contains('alex') || name.contains('male')) {
-                await _tts.setVoice({"name": v["name"], "locale": v["locale"]});
-                break;
-              }
-            }
-          }
-        }
-      }
-    } catch (e) {
-      debugPrint("Error setting TTS voice: $e");
-    }
-  }
 
   @override
   void dispose() {
@@ -93,7 +66,7 @@ class _PlayScreenState extends State<PlayScreen> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.settings != widget.settings) {
       if (oldWidget.settings.voiceGender != widget.settings.voiceGender) {
-        _setupVoice();
+        _tts.setupVoice(widget.settings.voiceGender);
       }
       _reset();
     }
@@ -172,7 +145,7 @@ class _PlayScreenState extends State<PlayScreen> {
     });
   }
 
-  void _showNextNumber(int delayMs) async {
+  void _showNextNumber(int delayMs) {
     if (!mounted) return;
     
     final currentNum = _sequence[_currentIndex];
@@ -182,17 +155,8 @@ class _PlayScreenState extends State<PlayScreen> {
     });
 
     if (widget.settings.mode == GameMode.audio || widget.settings.mode == GameMode.both) {
-      double rate = 0.5;
-      switch (widget.settings.speed) {
-        case GameSpeed.ultraFast: rate = 1.0; break;
-        case GameSpeed.fast: rate = 0.75; break;
-        case GameSpeed.normal: rate = 0.5; break;
-        case GameSpeed.slow: rate = 0.4; break;
-        case GameSpeed.ultraSlow: rate = 0.3; break;
-      }
-      await _tts.setSpeechRate(rate);
-      await _tts.stop(); // Stop any currently playing audio to prevent overlap/skipping
-      await _tts.speak(currentNum.toString());
+      _tts.setSpeechRate(widget.settings.speed);
+      _tts.speak(currentNum.toString());
     }
 
     _timer = Timer(Duration(milliseconds: delayMs), () {
@@ -229,8 +193,26 @@ class _PlayScreenState extends State<PlayScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF2B0B3F), Color(0xFF0D021A)],
+        ),
+      ),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            if (_phase == PlayPhase.playing) {
+              widget.onPlayingStateChanged?.call(false);
+            }
+            widget.onBack();
+          },
+        ),
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -240,45 +222,34 @@ class _PlayScreenState extends State<PlayScreen> {
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xFF1A1D2E),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFF2E3150)),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  widget.settings.mode == GameMode.audio ? Icons.volume_up :
-                  widget.settings.mode == GameMode.display ? Icons.desktop_windows : Icons.layers,
-                  size: 16, color: Colors.grey,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  widget.settings.mode.name.toUpperCase(),
-                  style: const TextStyle(fontSize: 10, color: Colors.grey),
-                ),
-              ],
-            ),
-          )
-        ],
       ),
       body: Column(
         children: [
           // Settings pill row
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                _buildSettingPill('Digits', widget.settings.digits.toString()),
-                const SizedBox(width: 8),
-                _buildSettingPill('Count', widget.settings.count.toString()),
-                const SizedBox(width: 8),
-                _buildSettingPill('Speed', widget.settings.speed.name.toUpperCase()),
-              ],
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildSettingPill('Digits', widget.settings.digits.toString(), Icons.numbers, Colors.cyanAccent),
+                    const SizedBox(width: 8),
+                    _buildSettingPill('Count', widget.settings.count.toString(), Icons.repeat, Colors.orangeAccent),
+                    const SizedBox(width: 8),
+                    _buildSettingPill('Speed', widget.settings.speed.name.toUpperCase(), Icons.speed, Colors.pinkAccent),
+                    const SizedBox(width: 8),
+                    _buildSettingPill(
+                      'Mode', 
+                      widget.settings.mode.name.toUpperCase(), 
+                      widget.settings.mode == GameMode.audio ? Icons.volume_up :
+                      widget.settings.mode == GameMode.display ? Icons.desktop_windows : Icons.layers, 
+                      Colors.purpleAccent
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
           
@@ -301,21 +272,32 @@ class _PlayScreenState extends State<PlayScreen> {
           )
         ],
       ),
+      ),
     );
   }
 
-  Widget _buildSettingPill(String label, String value) {
+  Widget _buildSettingPill(String label, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF1A1D2E),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF2E3150)),
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.1),
+            blurRadius: 8,
+            spreadRadius: 0,
+          )
+        ],
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Text('$label: ', style: const TextStyle(color: Colors.grey, fontSize: 12)),
-          Text(value, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+          Icon(icon, color: color, size: 14),
+          const SizedBox(width: 6),
+          Text('$label: ', style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
+          Text(value, style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 1.1)),
         ],
       ),
     );
@@ -323,37 +305,70 @@ class _PlayScreenState extends State<PlayScreen> {
 
   Widget _buildFlashCardArea() {
     return AspectRatio(
-      aspectRatio: 4 / 3,
+      aspectRatio: 16 / 9,
       child: Container(
         width: double.infinity,
-        constraints: const BoxConstraints(maxWidth: 400),
+        constraints: const BoxConstraints(maxWidth: 600),
         decoration: BoxDecoration(
-        color: const Color(0xFF1A1D2E),
+          color: const Color(0xFF1A0B2E), // Solid deep purple color to match the mask
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.cyanAccent.withValues(alpha: 0.3), width: 2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.cyanAccent.withValues(alpha: 0.1),
+              blurRadius: 30,
+              spreadRadius: 2,
+            ),
+            BoxShadow(
+              color: Colors.purpleAccent.withValues(alpha: 0.15),
+              blurRadius: 60,
+              spreadRadius: 5,
+            ),
+          ],
+        ),
+      child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF2E3150)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.blue.withOpacity(0.08),
-            blurRadius: 60,
-            spreadRadius: 0,
-          )
-        ],
-      ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          if (_phase == PlayPhase.idle)
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // HUD Corner Accents
+            Positioned(top: 16, left: 16, child: _buildHudCorner(true, true)),
+            Positioned(top: 16, right: 16, child: _buildHudCorner(true, false)),
+            Positioned(bottom: 16, left: 16, child: _buildHudCorner(false, true)),
+            Positioned(bottom: 16, right: 16, child: _buildHudCorner(false, false)),
+            // Top and Bottom HUD scanlines
+            Positioned(
+              top: 0,
+              child: Container(width: 200, height: 3, decoration: const BoxDecoration(
+                gradient: LinearGradient(colors: [Colors.transparent, Colors.cyanAccent, Colors.transparent]),
+                boxShadow: [BoxShadow(color: Colors.cyanAccent, blurRadius: 10)],
+              )),
+            ),
+            Positioned(
+              bottom: 0,
+              child: Container(width: 200, height: 3, decoration: const BoxDecoration(
+                gradient: LinearGradient(colors: [Colors.transparent, Colors.pinkAccent, Colors.transparent]),
+                boxShadow: [BoxShadow(color: Colors.pinkAccent, blurRadius: 10)],
+              )),
+            ),
+            if (_phase == PlayPhase.idle)
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 64, height: 64,
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                ShaderMask(
+                  blendMode: BlendMode.screen,
+                  shaderCallback: (bounds) => const LinearGradient(
+                    colors: [
+                      Color(0xFF1A0B2E),
+                      Color(0xFF1A0B2E),
+                    ],
+                  ).createShader(bounds),
+                  child: Image.asset(
+                    'assets/images/mascot_home.jpg',
+                    width: 150,
+                    height: 150,
+                    fit: BoxFit.contain,
                   ),
-                  child: const Icon(Icons.play_arrow, color: Colors.blue, size: 32),
                 ),
                 const SizedBox(height: 12),
                 const Text('Ready to test your math skills?', style: TextStyle(color: Colors.grey)),
@@ -417,6 +432,22 @@ class _PlayScreenState extends State<PlayScreen> {
         ],
       ),
       ),
+      ),
+    );
+  }
+
+  Widget _buildHudCorner(bool isTop, bool isLeft) {
+    return Container(
+      width: 24,
+      height: 24,
+      decoration: BoxDecoration(
+        border: Border(
+          top: isTop ? const BorderSide(color: Colors.cyanAccent, width: 3) : BorderSide.none,
+          bottom: !isTop ? const BorderSide(color: Colors.cyanAccent, width: 3) : BorderSide.none,
+          left: isLeft ? const BorderSide(color: Colors.cyanAccent, width: 3) : BorderSide.none,
+          right: !isLeft ? const BorderSide(color: Colors.cyanAccent, width: 3) : BorderSide.none,
+        ),
+      ),
     );
   }
 
@@ -426,63 +457,137 @@ class _PlayScreenState extends State<PlayScreen> {
       child: Column(
         children: [
           if (_phase == PlayPhase.idle)
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton.icon(
-                onPressed: _startGame,
-                icon: const Icon(Icons.play_arrow, color: Colors.white),
-                label: const Text('Start', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-              ),
+            _PlayGameButton(
+              onPressed: _startGame,
+              label: 'Start',
+              icon: Icons.rocket_launch,
+              colors: const [Colors.pinkAccent, Colors.deepOrangeAccent],
             ),
           if (_phase == PlayPhase.playing)
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: OutlinedButton.icon(
-                onPressed: _reset,
-                icon: const Icon(Icons.refresh, color: Colors.grey),
-                label: const Text('Reset', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.grey)),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFF2E3150)),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                ),
-              ),
+            _PlayGameButton(
+              onPressed: _reset,
+              label: 'Reset',
+              icon: Icons.refresh,
+              colors: const [Colors.purpleAccent, Colors.deepPurpleAccent],
             ),
           if (_phase == PlayPhase.answer)
             if (!_isAnswerRevealed)
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton.icon(
-                  onPressed: () => setState(() => _isAnswerRevealed = true),
-                  icon: const Icon(Icons.visibility, color: Color(0xFF0F1117)),
-                  label: const Text('Show Answer', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF0F1117))),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.amber,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                ),
+              _PlayGameButton(
+                onPressed: () => setState(() => _isAnswerRevealed = true),
+                label: 'Show Answer',
+                icon: Icons.visibility,
+                colors: const [Colors.orangeAccent, Colors.deepOrangeAccent],
               )
             else
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: OutlinedButton.icon(
-                  onPressed: _startGame,
-                  icon: const Icon(Icons.refresh, color: Colors.white),
-                  label: const Text('Next', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFF2E3150)),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              _PlayGameButton(
+                onPressed: _startGame,
+                label: 'Next',
+                icon: Icons.skip_next,
+                colors: const [Colors.greenAccent, Colors.green],
+              ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PlayGameButton extends StatefulWidget {
+  final VoidCallback onPressed;
+  final String label;
+  final IconData icon;
+  final List<Color> colors;
+
+  const _PlayGameButton({
+    required this.onPressed,
+    required this.label,
+    required this.icon,
+    required this.colors,
+  });
+
+  @override
+  State<_PlayGameButton> createState() => _PlayGameButtonState();
+}
+
+class _PlayGameButtonState extends State<_PlayGameButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        widget.onPressed();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: Transform(
+        transform: Matrix4.skewX(-0.1),
+        child: SizedBox(
+          height: 64,
+          child: Stack(
+            children: [
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                top: 8,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: widget.colors.last.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(16),
                   ),
                 ),
               ),
-        ],
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 100),
+                bottom: _isPressed ? 0 : 8,
+                left: 0,
+                right: 0,
+                top: _isPressed ? 8 : 0,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: widget.colors,
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: widget.colors.first.withValues(alpha: 0.5), width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: widget.colors.first.withValues(alpha: 0.4),
+                        blurRadius: 12,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Transform(
+                      transform: Matrix4.skewX(0.1),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(widget.icon, color: Colors.white, size: 24),
+                          const SizedBox(width: 8),
+                          Text(
+                            widget.label.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: 2.0,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
