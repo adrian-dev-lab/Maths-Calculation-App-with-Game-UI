@@ -211,7 +211,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                         decoration: BoxDecoration(
-                                          color: isSelected ? Colors.black.withOpacity(0.15) : const Color(0xFF1A0C2E),
+                                          color: isSelected ? Colors.black.withValues(alpha: 0.15) : const Color(0xFF1A0C2E),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                         child: Text(ms[s]!, style: TextStyle(color: textColor, fontWeight: FontWeight.bold, fontSize: 12)),

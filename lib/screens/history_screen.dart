@@ -18,10 +18,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
   bool _exportMsg = false;
 
   void _handleExport() async {
-    print('Export button clicked!');
+    debugPrint('Export button clicked!');
     try {
       final records = await DatabaseService.getAllRecords();
-      print('Fetched ${records.length} records.');
+      debugPrint('Fetched ${records.length} records.');
       if (records.isEmpty) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No records to export')));
@@ -30,7 +30,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       
       final String path = Directory.current.path;
       final File file = File('$path\\flash_calc_history.csv');
-      print('Saving to ${file.path}');
+      debugPrint('Saving to ${file.path}');
       
       final buffer = StringBuffer();
       buffer.writeln('ID,Username,Date,Mode,Speed,Digits,Count,Answer,Sequence');
@@ -42,7 +42,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       }
       
       await file.writeAsString(buffer.toString());
-      print('File saved successfully!');
+      debugPrint('File saved successfully!');
       
       if (!mounted) return;
       showDialog(
@@ -57,7 +57,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
               Text('Export Successful', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
             ],
           ),
-          content: Text('Your history has been exported to:\\n\\n${file.path}', style: const TextStyle(color: Colors.white70)),
+          content: Text('Your history has been exported to:\n\n${file.path}', style: const TextStyle(color: Colors.white70)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
@@ -74,7 +74,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
         if (mounted) setState(() => _exportMsg = false);
       });
     } catch (e) {
-      print('Export error: $e');
+      debugPrint('Export error: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Export failed: $e', style: const TextStyle(color: Colors.white)), backgroundColor: Colors.red));
     }

@@ -13,3 +13,17 @@ __v0_jsx-dev-runtime.ts
 node_modules
 .next/
 .DS_Store
+
+# Flutter/Dart ignores
+build/
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+*.log
+
+# App Local Data
+*.csv
+*.db
+*-backup.zip
+flash_calc_history.csv
