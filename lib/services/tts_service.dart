@@ -28,29 +28,12 @@ class TtsService {
   /// Set voice based on gender setting. Fire-and-forget, never throws.
   Future<void> setupVoice(TtsVoiceGender gender) async {
     try {
-      final voices = await _tts.getVoices;
-      if (voices == null) return;
-      for (var v in voices) {
-        final name = (v['name'] as String).toLowerCase();
-        if (gender == TtsVoiceGender.female) {
-          if (name.contains('zira') ||
-              name.contains('samantha') ||
-              name.contains('female')) {
-            await _tts.setVoice({"name": v["name"], "locale": v["locale"]});
-            break;
-          }
-        } else {
-          if (!name.contains('female') &&
-              !name.contains('zira') &&
-              !name.contains('samantha')) {
-            if (name.contains('david') ||
-                name.contains('alex') ||
-                name.contains('male')) {
-              await _tts.setVoice({"name": v["name"], "locale": v["locale"]});
-              break;
-            }
-          }
-        }
+      // Android / Xiaomi TTS engines often don't have predictable 'male' or 'female' voice names.
+      // The most reliable cross-platform way to simulate gender is by adjusting the pitch.
+      if (gender == TtsVoiceGender.female) {
+        await _tts.setPitch(1.2); // Higher pitch for female
+      } else {
+        await _tts.setPitch(0.65); // Lower pitch for male
       }
     } catch (e) {
       debugPrint("[TtsService] setupVoice error: $e");

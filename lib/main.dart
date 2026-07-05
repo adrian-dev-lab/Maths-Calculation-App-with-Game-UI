@@ -42,6 +42,9 @@ void main() async {
     DeviceOrientation.landscapeLeft,
     DeviceOrientation.landscapeRight,
   ]);
+  
+  // Hide status bar and navigation bar (Full Screen)
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   runApp(const FlashAnzanApp());
 }

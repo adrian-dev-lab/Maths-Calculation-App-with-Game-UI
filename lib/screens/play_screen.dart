@@ -355,20 +355,11 @@ class _PlayScreenState extends State<PlayScreen> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ShaderMask(
-                  blendMode: BlendMode.screen,
-                  shaderCallback: (bounds) => const LinearGradient(
-                    colors: [
-                      Color(0xFF1A0B2E),
-                      Color(0xFF1A0B2E),
-                    ],
-                  ).createShader(bounds),
-                  child: Image.asset(
-                    'assets/images/mascot_home.jpg',
-                    width: 150,
-                    height: 150,
-                    fit: BoxFit.contain,
-                  ),
+                Image.asset(
+                  'assets/images/mascot_home.png',
+                  width: 150,
+                  height: 150,
+                  fit: BoxFit.contain,
                 ),
                 const SizedBox(height: 12),
                 const Text('Ready to test your math skills?', style: TextStyle(color: Colors.grey)),

@@ -41,18 +41,8 @@ class HomeScreen extends StatelessWidget {
             Expanded(
               flex: 5,
               child: Center(
-                child: ShaderMask(
-                  blendMode: BlendMode.screen,
-                  shaderCallback: (bounds) => const LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0xFF2B0B3F), 
-                      Color(0xFF0D021A),
-                    ],
-                  ).createShader(bounds),
-                  child: Image.asset(
-                    'assets/images/mascot_home.jpg',
+                child: Image.asset(
+                  'assets/images/mascot_home.png',
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) {
                     return Column(
@@ -61,7 +51,7 @@ class HomeScreen extends StatelessWidget {
                         const Icon(Icons.image_not_supported, color: Colors.grey, size: 64),
                         const SizedBox(height: 16),
                         Text(
-                          'Image not found:\nassets/images/mascot_home.jpg\n\nError: $error',
+                          'Image not found:\nassets/images/mascot_home.png\n\nError: $error',
                           style: const TextStyle(color: Colors.grey, fontSize: 14),
                           textAlign: TextAlign.center,
                         ),
@@ -71,7 +61,6 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ),
-          ),
 
           // Right Side: Buttons
           Expanded(
