@@ -367,31 +367,57 @@ class _PlayScreenState extends State<PlayScreen> {
             ),
 
             Expanded(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    left: 16.0,
-                    right: 16.0,
-                    top: 16.0,
-                    bottom: MediaQuery.of(context).size.width > 600
-                        ? 80.0
-                        : 64.0,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Center(child: _buildFlashCardArea(context)),
+              child: LayoutBuilder(
+                builder: (context, space) {
+                  final mobile = MediaQuery.sizeOf(context).width <= 600;
+                  if (!mobile) {
+                    // Keep the existing Windows / large-screen composition.
+                    return Center(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          left: 16,
+                          right: 16,
+                          top: 16,
+                          bottom: 80,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Center(
+                                child: _buildFlashCardArea(context),
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            Center(child: _buildButtons()),
+                          ],
+                        ),
                       ),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.width > 600
-                            ? 32
-                            : 16,
+                    );
+                  }
+
+                  // The phone layout scrolls instead of compressing the card
+                  // into a few pixels on short / landscape viewports.
+                  final cardWidth = (space.maxWidth - 32).clamp(0.0, 420.0);
+                  final cardHeight = (cardWidth * 0.75).clamp(220.0, 315.0);
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: cardWidth,
+                            height: cardHeight,
+                            child: _buildFlashCardArea(context),
+                          ),
+                          const SizedBox(height: 16),
+                          _buildButtons(),
+                        ],
                       ),
-                      Center(child: _buildButtons()),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -561,119 +587,156 @@ class _PlayScreenState extends State<PlayScreen> {
                   ),
                 ),
                 if (_phase == PlayPhase.idle)
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Flexible(
-                        child: Image.asset(
-                          'assets/images/mascot_home.png',
-                          width: isLarge ? 280 : 180,
-                          height: isLarge ? 280 : 180,
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Ready to test your math skills?',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: isLarge ? 18 : 14,
-                        ),
-                      ),
-                    ],
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final availableHeight = constraints.maxHeight;
+                      final availableWidth = constraints.maxWidth;
+                      final isMobile = MediaQuery.of(context).size.width <= 600;
+
+                      final mascotSize = isMobile
+                          ? (availableHeight * 0.55).clamp(0.0, 150.0)
+                          : (availableHeight * 0.65).clamp(0.0, 280.0);
+
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (availableHeight > 65)
+                            Flexible(
+                              child: Image.asset(
+                                'assets/images/mascot_home.png',
+                                width: mascotSize,
+                                height: mascotSize,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          if (availableHeight > 90) const SizedBox(height: 8),
+                          if (availableHeight > 45 && availableWidth > 100)
+                            Text(
+                              'Ready to test your math skills?',
+                              textAlign: TextAlign.center,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: isMobile ? 12 : 18,
+                              ),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 if (_phase == PlayPhase.playing && !_showNumber)
                   const CircularProgressIndicator(),
                 if (_phase == PlayPhase.playing && _showNumber)
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (widget.settings.mode == GameMode.audio)
-                        const Icon(
-                          Icons.volume_up,
-                          size: 80,
-                          color: Colors.amber,
-                        )
-                      else
-                        Text(
-                          _sequence[_currentIndex].toString(),
-                          style: TextStyle(
-                            fontSize: _baseFontSize,
-                            fontWeight: FontWeight.w900,
-                            color: _sequence[_currentIndex] < 0
-                                ? Colors.red
-                                : Colors.white,
-                          ),
-                        ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: List.generate(_sequence.length, (index) {
-                          return Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: 6,
-                            height: 6,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: index < _currentIndex
-                                  ? Colors.blue
-                                  : index == _currentIndex
-                                  ? Colors.white
-                                  : const Color(0xFF2E3150),
+                  _fitFlashContent(
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (widget.settings.mode == GameMode.audio)
+                          const Icon(
+                            Icons.volume_up,
+                            size: 80,
+                            color: Colors.amber,
+                          )
+                        else
+                          Text(
+                            _sequence[_currentIndex].toString(),
+                            style: TextStyle(
+                              fontSize: _baseFontSize,
+                              fontWeight: FontWeight.w900,
+                              color: _sequence[_currentIndex] < 0
+                                  ? Colors.red
+                                  : Colors.white,
                             ),
-                          );
-                        }),
-                      ),
-                    ],
+                          ),
+                        const SizedBox(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(_sequence.length, (index) {
+                            return Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: 6,
+                              height: 6,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: index < _currentIndex
+                                    ? Colors.blue
+                                    : index == _currentIndex
+                                    ? Colors.white
+                                    : const Color(0xFF2E3150),
+                              ),
+                            );
+                          }),
+                        ),
+                      ],
+                    ),
                   ),
                 if (_phase == PlayPhase.answer)
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        '= ?',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: _baseFontSize * 0.25,
-                          letterSpacing: 2,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      if (!_isAnswerRevealed)
+                  _fitFlashContent(
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
                         Text(
-                          '?',
+                          '= ?',
                           style: TextStyle(
-                            color: Colors.amber,
-                            fontSize: _baseFontSize * 0.5,
-                            fontWeight: FontWeight.w900,
+                            color: Colors.grey,
+                            fontSize: _baseFontSize * 0.25,
+                            letterSpacing: 2,
                           ),
-                        )
-                      else
-                        Column(
-                          children: [
-                            Text(
-                              '$_answer',
-                              style: TextStyle(
-                                color: Colors.green,
-                                fontSize: _baseFontSize * 0.8,
-                                fontWeight: FontWeight.w900,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              '${_sequence.map((n) => n > 0 && _sequence.indexOf(n) > 0 ? '+$n' : n).join(' ')} = $_answer',
-                              style: const TextStyle(
-                                color: Colors.grey,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
                         ),
-                    ],
+                        const SizedBox(height: 16),
+                        if (!_isAnswerRevealed)
+                          Text(
+                            '?',
+                            style: TextStyle(
+                              color: Colors.amber,
+                              fontSize: _baseFontSize * 0.5,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          )
+                        else
+                          Column(
+                            children: [
+                              Text(
+                                '$_answer',
+                                style: TextStyle(
+                                  color: Colors.green,
+                                  fontSize: _baseFontSize * 0.8,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${_sequence.map((n) => n > 0 && _sequence.indexOf(n) > 0 ? '+$n' : n).join(' ')} = $_answer',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
                   ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  // Scale down oversized number, answer and progress content without
+  // modifying the user's selected font size or changing desktop styling.
+  Widget _fitFlashContent(Widget child) {
+    return Positioned.fill(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.center,
+          child: child,
         ),
       ),
     );
