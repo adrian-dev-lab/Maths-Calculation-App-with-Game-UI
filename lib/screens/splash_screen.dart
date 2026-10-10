@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'app_shell.dart';
 
@@ -54,26 +55,45 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F1117),
+      backgroundColor: const Color(0xFF052B75), // Deep blue background
       body: GestureDetector(
         onTap: _navigateToHome,
         behavior: HitTestBehavior.opaque,
-        child: Center(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  height: double.infinity,
-                  child: Image.asset(
-                    'assets/images/loading_logo.png',
-                    fit: BoxFit.cover,
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Use cover but smartly align so the head isn't cut off on Desktop
+              Image.asset(
+                'assets/images/loading_logo.png',
+                fit: BoxFit.cover,
+                alignment: Alignment.center,
+              ),
+              // Gradient at bottom so text is always readable
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: 200,
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.8),
+                        Colors.transparent,
+                      ],
+                    ),
                   ),
                 ),
-                Positioned(
-                  bottom: 80,
+              ),
+              Positioned(
+                bottom: 50,
+                left: 0,
+                right: 0,
+                child: Center(
                   child: SizedBox(
                     width: 300,
                     child: TweenAnimationBuilder<double>(
@@ -93,23 +113,24 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                               ),
                             ),
                             const SizedBox(height: 16),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(50),
-                              child: LinearProgressIndicator(
-                                value: value,
-                                minHeight: 24,
-                                backgroundColor: Colors.white.withValues(alpha: 0.2),
-                                valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
+                            if (!_isLoaded)
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(50),
+                                child: LinearProgressIndicator(
+                                  value: value,
+                                  minHeight: 24,
+                                  backgroundColor: Colors.white.withValues(alpha: 0.2),
+                                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
+                                ),
                               ),
-                            ),
                           ],
                         );
                       },
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

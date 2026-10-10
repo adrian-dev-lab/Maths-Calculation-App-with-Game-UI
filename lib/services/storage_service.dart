@@ -9,6 +9,12 @@ class StorageService {
   static const String _keyMode = 'settings_mode';
   static const String _keyVoiceGender = 'settings_voice_gender';
   static const String _keyCharacter = 'settings_character';
+  static const String _keyFontSize = 'settings_font_size';
+
+  static const String _keyBeadsSequence = 'beads_sequence';
+  static const String _keyBeadsSpeed = 'beads_speed';
+  static const String _keyBeadsGroup = 'beads_group';
+  static const String _keyBeadsOperation = 'beads_operation';
 
   static const String _keyUsername = 'profile_username';
   static const String _keyAge = 'profile_age';
@@ -50,6 +56,7 @@ class StorageService {
     final modeIndex = _prefs.getInt(_keyMode) ?? GameSettings.defaultSettings.mode.index;
     final voiceIndex = _prefs.getInt(_keyVoiceGender) ?? GameSettings.defaultSettings.voiceGender.index;
     final characterIndex = _prefs.getInt(_keyCharacter) ?? GameSettings.defaultSettings.character.index;
+    final fontSizeIndex = _prefs.getInt(_keyFontSize) ?? GameSettings.defaultSettings.fontSize.index;
 
     return GameSettings(
       digits: digits,
@@ -58,6 +65,7 @@ class StorageService {
       mode: GameMode.values[modeIndex],
       voiceGender: TtsVoiceGender.values[voiceIndex],
       character: CharacterGender.values[characterIndex],
+      fontSize: DisplayFontSize.values[fontSizeIndex],
     );
   }
 
@@ -68,6 +76,7 @@ class StorageService {
     await _prefs.setInt(_keyMode, settings.mode.index);
     await _prefs.setInt(_keyVoiceGender, settings.voiceGender.index);
     await _prefs.setInt(_keyCharacter, settings.character.index);
+    await _prefs.setInt(_keyFontSize, settings.fontSize.index);
   }
 
   static String loadUsername() => _prefs.getString(_keyUsername) ?? "Alex";
@@ -86,4 +95,17 @@ class StorageService {
 
   static int loadTotalPlayTime() => _prefs.getInt(_keyTotalPlayTime) ?? 0;
   static Future<void> saveTotalPlayTime(int seconds) => _prefs.setInt(_keyTotalPlayTime, seconds);
+
+  // Beads Settings
+  static int loadBeadsSequence() => _prefs.getInt(_keyBeadsSequence) ?? 5;
+  static Future<void> saveBeadsSequence(int val) => _prefs.setInt(_keyBeadsSequence, val);
+
+  static String loadBeadsSpeed() => _prefs.getString(_keyBeadsSpeed) ?? 'Normal';
+  static Future<void> saveBeadsSpeed(String val) => _prefs.setString(_keyBeadsSpeed, val);
+
+  static int loadBeadsGroup() => _prefs.getInt(_keyBeadsGroup) ?? 5;
+  static Future<void> saveBeadsGroup(int val) => _prefs.setInt(_keyBeadsGroup, val);
+
+  static String loadBeadsOperation() => _prefs.getString(_keyBeadsOperation) ?? 'Addition';
+  static Future<void> saveBeadsOperation(String val) => _prefs.setString(_keyBeadsOperation, val);
 }

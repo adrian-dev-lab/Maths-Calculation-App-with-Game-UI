@@ -2,22 +2,37 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\x64\Debug\ZERO_CHECK</FullPath>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\x64\Debug\ZERO_CHECK</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\flutter\x64\Debug\flutter_assemble</FullPath>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\flutter\x64\Debug\flutter_assemble</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\plugins\flutter_tts\Debug\flutter_tts_plugin.dll</FullPath>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\plugins\file_selector_windows\Debug\file_selector_windows_plugin.dll</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\runner\Debug\flutter_ui_design.exe</FullPath>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\plugins\flutter_tts\Debug\flutter_tts_plugin.dll</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\x64\Debug\ALL_BUILD</FullPath>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\plugins\printing\Debug\printing_plugin.dll</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\x64\Debug\INSTALL</FullPath>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\plugins\share_plus\Debug\share_plus_plugin.dll</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\plugins\url_launcher_windows\Debug\url_launcher_windows_plugin.dll</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\runner\Debug\flutter_ui_design.exe</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\plugins\jni\shared\Debug\dartjni.dll</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\x64\Debug\ALL_BUILD</FullPath>
+    </ProjectOutput>
+    <ProjectOutput>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\x64\Debug\INSTALL</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

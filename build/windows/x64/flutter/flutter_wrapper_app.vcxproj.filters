@@ -1,28 +1,28 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="D:\Flash Calc\flutter-ui-design-v2\windows\flutter\ephemeral\cpp_client_wrapper\core_implementations.cc">
+    <ClCompile Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\flutter\ephemeral\cpp_client_wrapper\core_implementations.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Flash Calc\flutter-ui-design-v2\windows\flutter\ephemeral\cpp_client_wrapper\standard_codec.cc">
+    <ClCompile Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\flutter\ephemeral\cpp_client_wrapper\standard_codec.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Flash Calc\flutter-ui-design-v2\windows\flutter\ephemeral\cpp_client_wrapper\flutter_engine.cc">
+    <ClCompile Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\flutter\ephemeral\cpp_client_wrapper\flutter_engine.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Flash Calc\flutter-ui-design-v2\windows\flutter\ephemeral\cpp_client_wrapper\flutter_view_controller.cc">
+    <ClCompile Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\flutter\ephemeral\cpp_client_wrapper\flutter_view_controller.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\Flash Calc\flutter-ui-design-v2\windows\flutter\CMakeLists.txt" />
+    <CustomBuild Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\flutter\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{C7981380-135A-38FB-BFF4-DEA70D20728B}</UniqueIdentifier>
+      <UniqueIdentifier>{7F5ABC85-0CA8-3B3F-B180-CF926FFBF990}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{28195A14-7500-36C3-A245-2455AE5D923F}</UniqueIdentifier>
+      <UniqueIdentifier>{25F0F607-6C08-39E4-AAF5-B9A807135964}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

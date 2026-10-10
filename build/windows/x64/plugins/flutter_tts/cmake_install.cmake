@@ -1,4 +1,4 @@
-# Install script for directory: D:/Flash Calc/flutter-ui-design-v2/windows/flutter/ephemeral/.plugin_symlinks/flutter_tts/windows
+# Install script for directory: D:/Game Dev/Maths-Calculation-App-with-Game-UI/windows/flutter/ephemeral/.plugin_symlinks/flutter_tts/windows
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -35,6 +35,6 @@ endif()
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "D:/Flash Calc/flutter-ui-design-v2/build/windows/x64/plugins/flutter_tts/install_local_manifest.txt"
+  file(WRITE "D:/Game Dev/Maths-Calculation-App-with-Game-UI/build/windows/x64/plugins/flutter_tts/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

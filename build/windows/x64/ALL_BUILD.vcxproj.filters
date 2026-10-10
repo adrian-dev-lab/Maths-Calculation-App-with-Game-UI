@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="D:\Flash Calc\flutter-ui-design-v2\windows\CMakeLists.txt" />
+    <CustomBuild Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

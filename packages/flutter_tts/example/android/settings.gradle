@@ -1,3 +1,5 @@
+rootProject.name = "flutter_tts_example"
+
 pluginManagement {
     def flutterSdkPath = {
         def properties = new Properties()

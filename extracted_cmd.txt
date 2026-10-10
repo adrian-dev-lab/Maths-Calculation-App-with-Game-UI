@@ -1,0 +1,708 @@
+$lines = Get-Content -Path "beads_screen.dart"
+$linesToKeep = $lines[0..2664]
+$content = $linesToKeep -join "`r`n"
+$content += "`r`n`r`n"
+
+$content = $content.Replace("const _ReadyScreenHero(),", "const _ReadyPremiumHero(),")
+
+$appendContent = @"
+// ============================================================
+// EXACT IMPLEMENTATION
+class _ReadyPremiumHero extends StatelessWidget {
+  const _ReadyPremiumHero();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : MediaQuery.sizeOf(context).width;
+
+        final heroWidth =
+            (availableWidth * 0.84).clamp(250.0, 460.0);
+
+        final heroHeight = heroWidth * 0.62;
+
+        return SizedBox(
+          width: heroWidth,
+          height: heroHeight,
+          child: Stack(
+            alignment: Alignment.center,
+            clipBehavior: Clip.none,
+            children: [
+              // =================================================
+              // AMBIENT PURPLE GLOW
+              // =================================================
+              Positioned(
+                top: heroHeight * 0.06,
+                child: Container(
+                  width: heroWidth * 0.82,
+                  height: heroHeight * 0.80,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        const Color(0xFF7F39FF)
+                            .withValues(alpha: 0.20),
+                        const Color(0xFF5B22B0)
+                            .withValues(alpha: 0.10),
+                        const Color(0xFF32105F)
+                            .withValues(alpha: 0.04),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.45, 0.72, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+
+              // =================================================
+              // LEFT DECORATIONS
+              // =================================================
+              Positioned(
+                left: heroWidth * 0.025,
+                top: heroHeight * 0.22,
+                child: _PremiumSparkle(
+                  size: heroWidth * 0.070,
+                  color: const Color(0xFFFFD447),
+                ),
+              ),
+
+              Positioned(
+                left: heroWidth * 0.006,
+                top: heroHeight * 0.50,
+                child: Container(
+                  width: heroWidth * 0.024,
+                  height: heroWidth * 0.024,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF8A44FF),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF8A44FF)
+                            .withValues(alpha: 0.30),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Positioned(
+                left: heroWidth * 0.095,
+                bottom: heroHeight * 0.08,
+                child: _PremiumSparkle(
+                  size: heroWidth * 0.043,
+                  color: const Color(0xFFFFD447),
+                ),
+              ),
+
+              // =================================================
+              // RIGHT DECORATIONS
+              // =================================================
+              Positioned(
+                right: heroWidth * 0.020,
+                top: heroHeight * 0.29,
+                child: _PremiumSparkle(
+                  size: heroWidth * 0.078,
+                  color: const Color(0xFFFFD447),
+                ),
+              ),
+
+              Positioned(
+                right: heroWidth * 0.005,
+                top: heroHeight * 0.56,
+                child: Container(
+                  width: heroWidth * 0.022,
+                  height: heroWidth * 0.022,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF8A44FF),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF8A44FF)
+                            .withValues(alpha: 0.30),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              Positioned(
+                right: heroWidth * 0.105,
+                top: heroHeight * 0.055,
+                child: Container(
+                  width: heroWidth * 0.017,
+                  height: heroWidth * 0.017,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color(0xFF8A44FF),
+                  ),
+                ),
+              ),
+
+              Positioned(
+                right: heroWidth * 0.11,
+                bottom: heroHeight * 0.07,
+                child: _PremiumSparkle(
+                  size: heroWidth * 0.036,
+                  color: const Color(0xFFFFD447),
+                ),
+              ),
+
+              // =================================================
+              // MAIN ABACUS
+              // =================================================
+              Center(
+                child: SizedBox(
+                  width: heroWidth * 0.70,
+                  height: heroHeight * 0.70,
+                  child: const _PremiumReadyAbacus(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+
+// ============================================================
+// PREMIUM READY ABACUS
+// ============================================================
+
+class _PremiumReadyAbacus extends StatelessWidget {
+  const _PremiumReadyAbacus();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final w = constraints.maxWidth;
+        final h = constraints.maxHeight;
+
+        final radius = w * 0.065;
+        final frameDepth = w * 0.028;
+
+        return Stack(
+          children: [
+            // ---------------------------------------------------
+            // BACK DEPTH / SHADOW FRAME
+            // ---------------------------------------------------
+            Positioned(
+              left: w * 0.022,
+              top: h * 0.025,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(radius),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF8E3D14),
+                      Color(0xFF5A240B),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            // ---------------------------------------------------
+            // FRONT OUTER FRAME
+            // ---------------------------------------------------
+            Positioned(
+              left: 0,
+              top: 0,
+              right: w * 0.022,
+              bottom: h * 0.025,
+              child: Container(
+                padding: EdgeInsets.all(frameDepth),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(radius),
+
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFFFFE17A),
+                      Color(0xFFFFC04C),
+                      Color(0xFFE58C31),
+                      Color(0xFFB85B1F),
+                      Color(0xFF7E3310),
+                    ],
+                    stops: [
+                      0.0,
+                      0.22,
+                      0.50,
+                      0.76,
+                      1.0,
+                    ],
+                  ),
+
+                  border: Border.all(
+                    width: 2,
+                    color: const Color(0xFFFFDE7A),
+                  ),
+
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.40),
+                      blurRadius: 16,
+                      offset: const Offset(0, 9),
+                    ),
+                    BoxShadow(
+                      color: const Color(0xFFFFA52A)
+                          .withValues(alpha: 0.17),
+                      blurRadius: 18,
+                    ),
+                  ],
+                ),
+
+                child: Stack(
+                  children: [
+                    // ------------------------------------------------
+                    // INNER DARK BOARD
+                    // ------------------------------------------------
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            BorderRadius.circular(radius * 0.62),
+
+                        gradient: const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color(0xFF5A260D),
+                            Color(0xFF3B1707),
+                            Color(0xFF210C03),
+                          ],
+                          stops: [0.0, 0.46, 1.0],
+                        ),
+
+                        border: Border.all(
+                          color: const Color(0xFF7D3511),
+                          width: 2,
+                        ),
+
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black
+                                .withValues(alpha: 0.52),
+                            blurRadius: 8,
+                            blurStyle: BlurStyle.inner,
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    // ------------------------------------------------
+                    // SUBTLE TOP-LIGHT
+                    // ------------------------------------------------
+                    Positioned(
+                      top: 4,
+                      left: 12,
+                      right: 12,
+                      child: Container(
+                        height: 3,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(99),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.transparent,
+                              Colors.white.withValues(alpha: 0.24),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // ------------------------------------------------
+                    // HORIZONTAL BEAM
+                    // ------------------------------------------------
+                    Positioned(
+                      left: w * 0.045,
+                      right: w * 0.045,
+                      top: h * 0.365,
+                      child: Container(
+                        height: h * 0.078,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(99),
+
+                          gradient: const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFF9D4D1B),
+                              Color(0xFF652A0D),
+                              Color(0xFF371205),
+                            ],
+                            stops: [0.0, 0.5, 1.0],
+                          ),
+
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black
+                                  .withValues(alpha: 0.48),
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // ------------------------------------------------
+                    // FOUR COLUMNS
+                    // ------------------------------------------------
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: w * 0.075,
+                      ),
+                      child: Row(
+                        mainAxisAlignment:
+                            MainAxisAlignment.spaceBetween,
+                        children: const [
+                          _PremiumReadyColumn(),
+                          _PremiumReadyColumn(),
+                          _PremiumReadyColumn(),
+                          _PremiumReadyColumn(),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+
+// ============================================================
+// PREMIUM COLUMN
+// ============================================================
+
+class _PremiumReadyColumn extends StatelessWidget {
+  const _PremiumReadyColumn();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final h = constraints.maxHeight;
+
+        final maxColumnWidth =
+            constraints.maxWidth.isFinite
+                ? constraints.maxWidth
+                : 44.0;
+
+        final beadWidth =
+            (maxColumnWidth * 0.78).clamp(26.0, 38.0);
+
+        final beadHeight =
+            (beadWidth * 0.62).clamp(16.0, 24.0);
+
+        final rodWidth =
+            (maxColumnWidth * 0.10).clamp(3.2, 5.2);
+
+        return SizedBox(
+          width: maxColumnWidth,
+          height: h,
+          child: Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              // ------------------------------------------------
+              // ROD SHADOW
+              // ------------------------------------------------
+              Positioned(
+                top: h * 0.025,
+                bottom: h * 0.035,
+                child: Container(
+                  width: rodWidth + 2,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(99),
+                    color: Colors.black.withValues(alpha: 0.18),
+                  ),
+                ),
+              ),
+
+              // ------------------------------------------------
+              // GOLD ROD
+              // ------------------------------------------------
+              Positioned(
+                top: h * 0.025,
+                bottom: h * 0.035,
+                child: Container(
+                  width: rodWidth,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(99),
+
+                    gradient: const LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0xFFFFE17D),
+                        Color(0xFFFFB536),
+                        Color(0xFFD9781C),
+                        Color(0xFF9F450F),
+                      ],
+                    ),
+
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFFFA51C)
+                            .withValues(alpha: 0.17),
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // ------------------------------------------------
+              // UPPER BEAD
+              // ------------------------------------------------
+              Positioned(
+                top: h * 0.075,
+                child: _PremiumReadyBead(
+                  width: beadWidth,
+                  height: beadHeight,
+                ),
+              ),
+
+              // ------------------------------------------------
+              // LOWER BEADS
+              // ------------------------------------------------
+              Positioned(
+                top: h * 0.535,
+                child: _PremiumReadyBead(
+                  width: beadWidth,
+                  height: beadHeight,
+                ),
+              ),
+
+              Positioned(
+                top: h * 0.690,
+                child: _PremiumReadyBead(
+                  width: beadWidth,
+                  height: beadHeight,
+                ),
+              ),
+
+              Positioned(
+                top: h * 0.845,
+                child: _PremiumReadyBead(
+                  width: beadWidth,
+                  height: beadHeight,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+
+// ============================================================
+// PREMIUM GOLD BEAD
+// ============================================================
+
+class _PremiumReadyBead extends StatelessWidget {
+  final double width;
+  final double height;
+
+  const _PremiumReadyBead({
+    required this.width,
+    required this.height,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+
+      decoration: BoxDecoration(
+        borderRadius:
+            BorderRadius.circular(height * 0.62),
+
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFFFFFB0),
+            Color(0xFFFFE06C),
+            Color(0xFFFFC133),
+            Color(0xFFFF9712),
+            Color(0xFFD66B08),
+          ],
+          stops: [
+            0.0,
+            0.20,
+            0.46,
+            0.72,
+            1.0,
+          ],
+        ),
+
+        border: Border.all(
+          width: 0.8,
+          color: const Color(0xFFFFD961)
+              .withValues(alpha: 0.80),
+        ),
+
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFFFA414)
+                .withValues(alpha: 0.32),
+            blurRadius: 6,
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.30),
+            blurRadius: 3,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+
+      child: Stack(
+        children: [
+          // ----------------------------------------------------
+          // HIGHLIGHT
+          // ----------------------------------------------------
+          Positioned(
+            left: width * 0.18,
+            top: height * 0.12,
+            child: Container(
+              width: width * 0.30,
+              height: height * 0.16,
+
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(99),
+                color: Colors.white.withValues(alpha: 0.34),
+              ),
+            ),
+          ),
+
+          // ----------------------------------------------------
+          // SOFT LOWER DEPTH
+          // ----------------------------------------------------
+          Positioned(
+            left: width * 0.10,
+            right: width * 0.10,
+            bottom: height * 0.08,
+            child: Container(
+              height: height * 0.18,
+
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(99),
+                color: const Color(0xFFB85605)
+                    .withValues(alpha: 0.18),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+// ============================================================
+// PREMIUM SPARKLE
+// ============================================================
+
+class _PremiumSparkle extends StatelessWidget {
+  final double size;
+  final Color color;
+
+  const _PremiumSparkle({
+    required this.size,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size.square(size),
+      painter: _PremiumSparklePainter(color),
+    );
+  }
+}
+
+
+class _PremiumSparklePainter extends CustomPainter {
+  final Color color;
+
+  _PremiumSparklePainter(this.color);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    final path = Path()
+      ..moveTo(cx, 0)
+      ..quadraticBezierTo(
+        cx + size.width * 0.09,
+        cy - size.height * 0.09,
+        size.width,
+        cy,
+      )
+      ..quadraticBezierTo(
+        cx + size.width * 0.09,
+        cy + size.height * 0.09,
+        cx,
+        size.height,
+      )
+      ..quadraticBezierTo(
+        cx - size.width * 0.09,
+        cy + size.height * 0.09,
+        0,
+        cy,
+      )
+      ..quadraticBezierTo(
+        cx - size.width * 0.09,
+        cy - size.height * 0.09,
+        cx,
+        0,
+      )
+      ..close();
+
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    canvas.drawShadow(
+      path,
+      color.withValues(alpha: 0.42),
+      6,
+      false,
+    );
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(
+    covariant _PremiumSparklePainter oldDelegate,
+  ) {
+    return oldDelegate.color != color;
+  }
+}
+"@
+
+$content += $appendContent
+Set-Content -NoNewline -Path "beads_screen.dart" -Value $content

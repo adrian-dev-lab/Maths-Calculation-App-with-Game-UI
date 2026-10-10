@@ -1,0 +1,198 @@
+24: applied recorded diff
+51: matched 31 historical source lines
+54: applied recorded diff
+61: applied recorded diff
+65: applied recorded diff
+73: matched 31 historical source lines
+76: matched 31 historical source lines
+82: applied recorded diff
+97: applied recorded diff
+103: matched 31 historical source lines
+106: matched 41 historical source lines
+109: applied recorded diff
+115: applied recorded diff
+122: matched 41 historical source lines
+125: matched 81 historical source lines
+128: applied recorded diff
+137: matched 51 historical source lines
+140: matched 51 historical source lines
+143: matched 51 historical source lines
+146: applied recorded diff
+155: matched 51 historical source lines
+158: matched 31 historical source lines
+161: applied recorded diff
+167: matched 81 historical source lines
+173: matched 50 historical source lines
+182: applied recorded diff
+188: matched 51 historical source lines
+191: applied recorded diff
+212: matched 31 historical source lines
+215: matched 25 historical source lines
+218: applied recorded diff
+270: matched 151 historical source lines
+273: matched 151 historical source lines
+276: applied recorded diff
+282: matched 71 historical source lines
+285: matched 35 historical source lines
+288: applied recorded diff
+294: matched 101 historical source lines
+298: applied recorded diff
+306: matched 86 historical source lines
+309: matched 141 historical source lines
+312: applied recorded diff
+319: matched 61 historical source lines
+322: applied recorded diff
+329: matched 201 historical source lines
+332: applied recorded diff
+347: matched 268 historical source lines
+349: applied recorded diff
+351: applied recorded diff
+355: applied recorded diff
+360: matched 80 historical source lines
+362: matched 21 historical source lines
+364: matched 41 historical source lines
+366: matched 31 historical source lines
+368: applied recorded diff
+370: matched 58 historical source lines
+372: matched 31 historical source lines
+374: matched 23 historical source lines
+376: applied recorded diff
+378: matched 51 historical source lines
+381: matched 11 historical source lines
+383: matched 7 historical source lines
+387: applied recorded diff
+391: matched 11 historical source lines
+393: matched 17 historical source lines
+395: matched 11 historical source lines
+396: replayed inspected string operation
+399: matched 21 historical source lines
+401: matched 7 historical source lines
+405: matched 5 historical source lines
+406: replayed inspected string operation
+414: matched 303 historical source lines
+417: applied recorded diff
+443: matched 40 historical source lines
+446: applied recorded diff
+459: applied recorded diff
+497: applied recorded diff
+509: applied recorded diff
+524: applied recorded diff
+537: applied recorded diff
+546: applied recorded diff
+550: matched 11 historical source lines
+558: applied recorded diff
+564: matched 21 historical source lines
+567: matched 101 historical source lines
+570: applied recorded diff
+573: matched 21 historical source lines
+579: applied recorded diff
+594: matched 56 historical source lines
+597: applied recorded diff
+612: applied recorded diff
+615: matched 31 historical source lines
+618: matched 16 historical source lines
+621: matched 19 historical source lines
+627: applied recorded diff
+644: matched 11 historical source lines
+647: applied recorded diff
+698: matched 91 historical source lines
+701: applied recorded diff
+707: matched 11 historical source lines
+710: matched 72 historical source lines
+713: matched 16 historical source lines
+716: applied recorded diff
+722: matched 31 historical source lines
+725: matched 24 historical source lines
+728: matched 56 historical source lines
+731: applied recorded diff
+738: matched 72 historical source lines
+741: matched 13 historical source lines
+745: matched 31 historical source lines
+750: applied recorded diff
+756: matched 31 historical source lines
+759: matched 61 historical source lines
+762: applied recorded diff
+765: matched 51 historical source lines
+768: applied recorded diff
+774: matched 21 historical source lines
+777: matched 16 historical source lines
+780: applied recorded diff
+787: matched 31 historical source lines
+790: matched 71 historical source lines
+793: matched 16 historical source lines
+796: applied recorded diff
+803: matched 80 historical source lines
+806: matched 16 historical source lines
+809: matched 16 historical source lines
+812: applied recorded diff
+822: applied recorded diff
+829: matched 90 historical source lines
+832: matched 31 historical source lines
+835: applied recorded diff
+842: matched 16 historical source lines
+845: matched 26 historical source lines
+848: applied recorded diff
+858: matched 290 historical source lines
+861: applied recorded diff
+871: matched 221 historical source lines
+875: matched 51 historical source lines
+880: matched 31 historical source lines
+883: applied recorded diff
+890: matched 66 historical source lines
+893: applied recorded diff
+902: matched 31 historical source lines
+905: applied recorded diff
+908: matched 23 historical source lines
+911: applied recorded diff
+921: applied recorded diff
+931: applied recorded diff
+950: matched 346 historical source lines
+953: applied recorded diff
+966: matched 246 historical source lines
+969: applied recorded diff
+982: applied recorded diff
+998: applied recorded diff
+1011: applied recorded diff
+1024: applied recorded diff
+1058: matched 71 historical source lines
+1067: matched 10 historical source lines
+1073: matched 33 historical source lines
+1079: matched 10 historical source lines
+1082: matched 36 historical source lines
+1085: matched 9 historical source lines
+1092: matched 6 historical source lines
+1095: matched 29 historical source lines
+1100: matched 5 historical source lines
+1106: matched 6 historical source lines
+1112: applied recorded diff
+1115: matched 29 historical source lines
+1120: replayed inspected string operation
+1124: matched 29 historical source lines
+1130: matched 12 historical source lines
+1135: replayed inspected string operation
+1152: matched 121 historical source lines
+1155: matched 51 historical source lines
+1158: applied recorded diff
+1184: matched 101 historical source lines
+1187: matched 201 historical source lines
+1192: replayed inspected string operation
+1196: matched 41 historical source lines
+1198: replayed inspected string operation
+1209: matched 26 historical source lines
+1214: replayed inspected string operation
+1224: matched 21 historical source lines
+1227: matched 21 historical source lines
+1232: replayed inspected string operation
+1236: matched 313 historical source lines
+1248: matched 101 historical source lines
+1251: matched 51 historical source lines
+1253: replayed inspected string operation
+1264: matched 21 historical source lines
+1278: matched 301 historical source lines
+1281: matched 51 historical source lines
+1283: replayed inspected string operation
+1295: replayed inspected string operation
+1311: replayed inspected string operation
+1325: matched 21 historical source lines
+1333: replayed inspected string operation
+1347: matched 26 historical source lines

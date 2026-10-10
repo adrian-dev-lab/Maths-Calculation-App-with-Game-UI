@@ -2,13 +2,13 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\x64\Debug\ZERO_CHECK</FullPath>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\x64\Debug\ZERO_CHECK</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\flutter\x64\Debug\flutter_assemble</FullPath>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\flutter\x64\Debug\flutter_assemble</FullPath>
     </ProjectOutput>
     <ProjectOutput>
-      <FullPath>D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\plugins\flutter_tts\Debug\flutter_tts_plugin.dll</FullPath>
+      <FullPath>D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\plugins\flutter_tts\Debug\flutter_tts_plugin.dll</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

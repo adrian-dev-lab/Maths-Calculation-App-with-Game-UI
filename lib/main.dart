@@ -57,6 +57,9 @@ class FlashAnzanApp extends StatelessWidget {
     return MaterialApp(
       title: 'MGA',
       debugShowCheckedModeBanner: false,
+      builder: (context, child) {
+        return ExcludeSemantics(child: child!);
+      },
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xFF0F1117),
@@ -65,7 +68,7 @@ class FlashAnzanApp extends StatelessWidget {
           secondary: Color(0xFFF59E0B),
           surface: Color(0xFF1A1D2E),
         ),
-        fontFamily: 'Courier', // Will fall back to system monospace if needed
+        fontFamily: 'Courier',
         useMaterial3: true,
       ),
       home: const SplashScreen(),

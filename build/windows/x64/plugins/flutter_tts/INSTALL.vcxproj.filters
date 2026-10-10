@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <CustomBuild Include="D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\CMakeFiles\cd6f9b0ea50c1cba000206f9bc3b27b1\INSTALL_force.rule">
+    <CustomBuild Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\CMakeFiles\5684f4c7ab0af3895ea2bff2af446e23\INSTALL_force.rule">
       <Filter>CMake Rules</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="CMake Rules">
-      <UniqueIdentifier>{C7981380-135A-38FB-BFF4-DEA70D20728B}</UniqueIdentifier>
+      <UniqueIdentifier>{7F5ABC85-0CA8-3B3F-B180-CF926FFBF990}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

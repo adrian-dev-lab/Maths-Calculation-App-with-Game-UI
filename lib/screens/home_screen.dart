@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/game_settings.dart';
-import 'settings_screen.dart' show ParticleClickEffect;
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final GameSettings settings;
-  final VoidCallback onAdventureTap;
   final VoidCallback onCalculationTap;
   final VoidCallback onBeadsTap;
   final VoidCallback onHistoryTap;
@@ -13,7 +11,6 @@ class HomeScreen extends StatelessWidget {
   const HomeScreen({
     super.key,
     required this.settings,
-    required this.onAdventureTap,
     required this.onCalculationTap,
     required this.onBeadsTap,
     required this.onHistoryTap,
@@ -21,216 +18,326 @@ class HomeScreen extends StatelessWidget {
   });
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _floatController;
+
+  @override
+  void initState() {
+    super.initState();
+    _floatController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _floatController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, 
+      backgroundColor: const Color(0xFF0A0214),
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
+          gradient: RadialGradient(
+            center: Alignment.topLeft,
+            radius: 1.5,
             colors: [
-              Color(0xFF2B0B3F), // Cosmic Deep Purple
-              Color(0xFF0D021A), // Deep Space Dark
+              Color(0xFF381460),
+              Color(0xFF150A21),
+              Color(0xFF0A0214),
             ],
+            stops: [0.0, 0.5, 1.0],
           ),
         ),
-        child: Row(
-          children: [
-            // Left Side: Mascot Image
-            Expanded(
-              flex: 5,
-              child: Center(
-                child: Image.asset(
-                  'assets/images/mascot_home.png',
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.image_not_supported, color: Colors.grey, size: 64),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Image not found:\nassets/images/mascot_home.png\n\nError: $error',
-                          style: const TextStyle(color: Colors.grey, fontSize: 14),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
-            ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final bool isPortrait = constraints.maxHeight > constraints.maxWidth;
+            final bool isMobile = constraints.maxWidth < 850 || isPortrait;
 
-          // Right Side: Buttons
-          Expanded(
-            flex: 4,
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 350),
-                child: Column(
+            // -----------------------------------------------------------------
+            // Mascot with Floating Animation & Glow
+            // -----------------------------------------------------------------
+            final mascotImage = Image.asset(
+              'assets/images/mascot_home.png',
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Premium3DMenuButton(
-                      title: 'ADVENTURE', 
-                      icon: Icons.explore, 
-                      colorDark: const Color(0xFF2874A6), // Soft Dark Blue
-                      colorLight: const Color(0xFF5DADE2), // Soft Sky Blue
-                      onTap: onAdventureTap,
-                    ),
-                    const SizedBox(height: 18),
-                    Premium3DMenuButton(
-                      title: 'CALCULATION', 
-                      icon: Icons.calculate, 
-                      colorDark: const Color(0xFFD4AC0D), // Soft Mustard Gold
-                      colorLight: const Color(0xFFF4D03F), // Soft Sun Yellow
-                      onTap: onCalculationTap,
-                    ),
-                    const SizedBox(height: 18),
-                    Premium3DMenuButton(
-                      title: 'BEADS', 
-                      icon: Icons.view_module, 
-                      colorDark: const Color(0xFF229954), // Soft Leaf Green
-                      colorLight: const Color(0xFF58D68D), // Soft Mint Green
-                      onTap: onBeadsTap,
-                    ),
-                    const SizedBox(height: 18),
-                    Premium3DMenuButton(
-                      title: 'HISTORY', 
-                      icon: Icons.history, 
-                      colorDark: const Color(0xFFC0392B), // Soft Brick Red
-                      colorLight: const Color(0xFFEC7063), // Soft Watermelon Pink
-                      onTap: onHistoryTap,
-                    ),
-                    const SizedBox(height: 18),
-                    Premium3DMenuButton(
-                      title: 'SETTINGS', 
-                      icon: Icons.settings, 
-                      colorDark: const Color(0xFF8E44AD), // Soft Grape Purple
-                      colorLight: const Color(0xFFBB8FCE), // Soft Lilac
-                      onTap: onSettingsTap,
+                    const Icon(Icons.image_not_supported, color: Colors.grey, size: 64),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Image not found:\nassets/images/mascot_home.png',
+                      style: const TextStyle(color: Colors.grey, fontSize: 14),
+                      textAlign: TextAlign.center,
                     ),
                   ],
+                );
+              },
+            );
+
+            final mascotWidget = Stack(
+              alignment: Alignment.center,
+              children: [
+                // Glowing Aura behind mascot
+                Container(
+                  width: isMobile ? 200 : 300,
+                  height: isMobile ? 200 : 300,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.4),
+                        blurRadius: 100,
+                        spreadRadius: 20,
+                      ),
+                      BoxShadow(
+                        color: Colors.cyanAccent.withValues(alpha: 0.1),
+                        blurRadius: 60,
+                        spreadRadius: 50,
+                      ),
+                    ],
+                  ),
                 ),
+                // Floating Mascot
+                AnimatedBuilder(
+                  animation: _floatController,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(0, -15 + 30 * _floatController.value),
+                      child: child,
+                    );
+                  },
+                  child: mascotImage,
+                ),
+              ],
+            );
+
+            // -----------------------------------------------------------------
+            // Glowing Title
+            // -----------------------------------------------------------------
+            final titleWidget = Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'MATHS GENIUS ACADEMY',
+                  style: TextStyle(
+                    fontSize: isMobile ? 28 : 48,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: 2,
+                    shadows: [
+                      Shadow(
+                        color: Colors.cyanAccent.withValues(alpha: 0.6),
+                        blurRadius: 20,
+                      ),
+                      Shadow(
+                        color: Colors.purpleAccent.withValues(alpha: 0.6),
+                        blurRadius: 40,
+                      ),
+                    ],
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'MASTER YOUR MIND',
+                  style: TextStyle(
+                    fontSize: isMobile ? 12 : 16,
+                    color: Colors.cyanAccent.withValues(alpha: 0.8),
+                    letterSpacing: 6,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            );
+
+            // -----------------------------------------------------------------
+            // Glassmorphism Buttons
+            // -----------------------------------------------------------------
+            final buttonsWidget = ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _GlassMenuButton(
+                    title: 'CALCULATION',
+                    icon: Icons.calculate,
+                    accentColor: const Color(0xFFFACC15),
+                    onTap: widget.onCalculationTap,
+                  ),
+                  const SizedBox(height: 8),
+                  _GlassMenuButton(
+                    title: 'BEADS',
+                    icon: Icons.view_module,
+                    accentColor: const Color(0xFF4ADE80),
+                    onTap: widget.onBeadsTap,
+                  ),
+                  const SizedBox(height: 8),
+                  _GlassMenuButton(
+                    title: 'HISTORY',
+                    icon: Icons.history,
+                    accentColor: const Color(0xFFF87171),
+                    onTap: widget.onHistoryTap,
+                  ),
+                  const SizedBox(height: 8),
+                  _GlassMenuButton(
+                    title: 'SETTINGS',
+                    icon: Icons.settings,
+                    accentColor: const Color(0xFFA78BFA),
+                    onTap: widget.onSettingsTap,
+                  ),
+                ],
               ),
-            ),
-          ),
-          const SizedBox(width: 40),
-        ],
-      ),
+            );
+
+            // -----------------------------------------------------------------
+            // Layout (Mobile vs Desktop)
+            // -----------------------------------------------------------------
+            if (isMobile) {
+              return SafeArea(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        titleWidget,
+                        const SizedBox(height: 40),
+                        SizedBox(
+                          height: constraints.maxHeight * 0.35,
+                          child: mascotWidget,
+                        ),
+                        const SizedBox(height: 40),
+                        buttonsWidget,
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            } else {
+              return SafeArea(
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        titleWidget,
+                        const SizedBox(height: 60),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            SizedBox(
+                              width: 350,
+                              height: 380,
+                              child: mascotWidget,
+                            ),
+                            const SizedBox(width: 80),
+                            SizedBox(
+                              width: 400,
+                              child: buttonsWidget,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }
+          }
+        ),
       ),
     );
   }
 }
 
-class Premium3DMenuButton extends StatefulWidget {
+// -----------------------------------------------------------------------------
+// New Glassmorphism UI Button (Replacing the old Chunky 3D button)
+// -----------------------------------------------------------------------------
+class _GlassMenuButton extends StatefulWidget {
   final String title;
   final IconData icon;
-  final Color colorDark;
-  final Color colorLight;
+  final Color accentColor;
   final VoidCallback onTap;
 
-  const Premium3DMenuButton({
-    super.key,
+  const _GlassMenuButton({
     required this.title,
     required this.icon,
-    required this.colorDark,
-    required this.colorLight,
+    required this.accentColor,
     required this.onTap,
   });
 
   @override
-  State<Premium3DMenuButton> createState() => _Premium3DMenuButtonState();
+  State<_GlassMenuButton> createState() => _GlassMenuButtonState();
 }
 
-class _Premium3DMenuButtonState extends State<Premium3DMenuButton> {
+class _GlassMenuButtonState extends State<_GlassMenuButton> {
   bool _isHovered = false;
-  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
-    // Top layer gradient for a rich 3D curved look
-    final topGradient = LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [
-        _isHovered ? Color.lerp(Colors.white, widget.colorLight, 0.6)! : widget.colorLight,
-        _isHovered ? widget.colorLight : Color.lerp(widget.colorLight, widget.colorDark, 0.4)!,
-      ],
-    );
-    // Bottom layer color: dark shadow
-    final bottomColor = widget.colorDark;
-    
-    // Position of the top layer (distance from bottom)
-    final double offset = _isPressed ? 2.0 : (_isHovered ? 6.0 : 8.0);
-
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: GestureDetector(
-        onTapDown: (_) => setState(() => _isPressed = true),
-        onTapUp: (_) {
-          setState(() => _isPressed = false);
-        },
-        onTapCancel: () => setState(() => _isPressed = false),
-        child: ParticleClickEffect(
-          onTap: widget.onTap,
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-            height: 64,
-            child: Stack(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          height: 72,
+          decoration: BoxDecoration(
+            color: _isHovered 
+                ? widget.accentColor.withValues(alpha: 0.15) 
+                : Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: _isHovered ? widget.accentColor : Colors.white.withValues(alpha: 0.1),
+              width: _isHovered ? 2 : 1,
+            ),
+            boxShadow: _isHovered
+                ? [
+                    BoxShadow(
+                      color: widget.accentColor.withValues(alpha: 0.3),
+                      blurRadius: 16,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                : [],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Row(
               children: [
-                // Bottom shadow layer
-                Positioned(
-                  bottom: 0, left: 0, right: 0, top: 12,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: bottomColor,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.black45, width: 2),
+                Icon(
+                  widget.icon, 
+                  size: 32, 
+                  color: _isHovered ? Colors.white : widget.accentColor
+                ),
+                const SizedBox(width: 20),
+                Expanded(
+                  child: Text(
+                    widget.title,
+                    style: TextStyle(
+                      color: _isHovered ? Colors.white : Colors.white70,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 20,
+                      letterSpacing: 2.0,
                     ),
                   ),
                 ),
-                // Top clickable layer
-                AnimatedPositioned(
-                  duration: const Duration(milliseconds: 100),
-                  curve: Curves.easeOut,
-                  bottom: offset,
-                  left: 0, right: 0,
-                  top: 12 - offset,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: topGradient,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.black45, width: 2),
-                    ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.3), width: 2)), // Highlight
-                      ),
-                      child: Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(widget.icon, size: 24, color: Colors.white),
-                            const SizedBox(width: 12),
-                            Text(
-                              widget.title.toUpperCase(),
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
-                                fontSize: 18,
-                                letterSpacing: 2.0,
-                                shadows: [Shadow(color: Colors.black45, offset: Offset(0, 2), blurRadius: 0)],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  size: 24,
+                  color: _isHovered ? widget.accentColor : Colors.white30,
                 ),
               ],
             ),

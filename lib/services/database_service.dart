@@ -20,7 +20,7 @@ class DatabaseService {
 
     _db = await openDatabase(
       path,
-      version: 1,
+      version: 4,
       onCreate: (Database db, int version) async {
         await db.execute('''
           CREATE TABLE history (
@@ -32,9 +32,25 @@ class DatabaseService {
             mode TEXT,
             sequence TEXT,
             answer INTEGER,
-            username TEXT
+            username TEXT,
+            gameType TEXT,
+            questionsPlayed INTEGER,
+            durationInSeconds INTEGER,
+            operation TEXT
           )
         ''');
+      },
+      onUpgrade: (Database db, int oldVersion, int newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('ALTER TABLE history ADD COLUMN gameType TEXT DEFAULT "Number"');
+        }
+        if (oldVersion < 3) {
+          await db.execute('ALTER TABLE history ADD COLUMN questionsPlayed INTEGER DEFAULT 1');
+          await db.execute('ALTER TABLE history ADD COLUMN durationInSeconds INTEGER DEFAULT 0');
+        }
+        if (oldVersion < 4) {
+          await db.execute('ALTER TABLE history ADD COLUMN operation TEXT DEFAULT "Addition"');
+        }
       },
     );
   }
@@ -52,6 +68,10 @@ class DatabaseService {
         'sequence': jsonEncode(record.sequence),
         'answer': record.answer,
         'username': record.username,
+        'gameType': record.gameType,
+        'questionsPlayed': record.questionsPlayed,
+        'durationInSeconds': record.durationInSeconds,
+        'operation': record.operation,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
@@ -78,6 +98,10 @@ class DatabaseService {
         sequence: sequenceList,
         answer: maps[i]['answer'] as int,
         username: maps[i]['username'] as String,
+        gameType: (maps[i]['gameType'] as String? ?? 'Number').replaceAll(' Calculation', ''),
+        questionsPlayed: maps[i]['questionsPlayed'] as int? ?? 1,
+        durationInSeconds: maps[i]['durationInSeconds'] as int? ?? 0,
+        operation: maps[i]['operation'] as String? ?? 'Addition',
       );
     });
   }

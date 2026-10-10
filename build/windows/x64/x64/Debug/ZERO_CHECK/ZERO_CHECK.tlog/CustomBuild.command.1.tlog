@@ -1,6 +1,6 @@
-^D:\FLASH CALC\FLUTTER-UI-DESIGN-V2\BUILD\WINDOWS\X64\CMAKEFILES\E6C02DFE47D15380560DDC90F9C6C726\GENERATE.STAMP.RULE
+^D:\GAME DEV\MATHS-CALCULATION-APP-WITH-GAME-UI\BUILD\WINDOWS\X64\CMAKEFILES\0F5FCEC91FA338310B6146178489F866\GENERATE.STAMP.RULE
 setlocal
-"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SD:/Flash Calc/flutter-ui-design-v2/windows" "-BD:/Flash Calc/flutter-ui-design-v2/build/windows/x64" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "D:/Flash Calc/flutter-ui-design-v2/build/windows/x64/flutter_ui_design.slnx"
+E:\VisualStudio\2026\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe "-SD:/Game Dev/Maths-Calculation-App-with-Game-UI/windows" "-BD:/Game Dev/Maths-Calculation-App-with-Game-UI/build/windows/x64" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "D:/Game Dev/Maths-Calculation-App-with-Game-UI/build/windows/x64/flutter_ui_design.slnx"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

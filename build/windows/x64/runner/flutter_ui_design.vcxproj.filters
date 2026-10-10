@@ -1,33 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="D:\Flash Calc\flutter-ui-design-v2\windows\runner\flutter_window.cpp">
+    <ClCompile Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\runner\flutter_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Flash Calc\flutter-ui-design-v2\windows\runner\main.cpp">
+    <ClCompile Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\runner\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Flash Calc\flutter-ui-design-v2\windows\runner\utils.cpp">
+    <ClCompile Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\runner\utils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Flash Calc\flutter-ui-design-v2\windows\runner\win32_window.cpp">
+    <ClCompile Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\runner\win32_window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="D:\Flash Calc\flutter-ui-design-v2\windows\flutter\generated_plugin_registrant.cc">
+    <ClCompile Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\flutter\generated_plugin_registrant.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\Flash Calc\flutter-ui-design-v2\windows\runner\CMakeLists.txt" />
+    <CustomBuild Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\runner\CMakeLists.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="D:\Flash Calc\flutter-ui-design-v2\windows\runner\Runner.rc">
+    <ResourceCompile Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\runner\Runner.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{28195A14-7500-36C3-A245-2455AE5D923F}</UniqueIdentifier>
+      <UniqueIdentifier>{25F0F607-6C08-39E4-AAF5-B9A807135964}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

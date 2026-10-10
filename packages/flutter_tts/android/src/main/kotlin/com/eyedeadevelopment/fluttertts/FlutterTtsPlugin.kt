@@ -718,7 +718,7 @@ class FlutterTtsPlugin : MethodCallHandler, FlutterPlugin {
                 val file = File(fileName)
                 fullPath = file.path
 
-                tts!!.synthesizeToFile(text, bundle!!, file!!, SYNTHESIZE_TO_FILE_PREFIX + uuid)
+                tts!!.synthesizeToFile(text, bundle!!, file, SYNTHESIZE_TO_FILE_PREFIX + uuid)
             } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 val resolver = this.context?.contentResolver
                 val contentValues = ContentValues().apply {
@@ -736,7 +736,7 @@ class FlutterTtsPlugin : MethodCallHandler, FlutterPlugin {
                 val file = File(musicDir, fileName)
                 fullPath = file.path
 
-                tts!!.synthesizeToFile(text, bundle!!, file!!, SYNTHESIZE_TO_FILE_PREFIX + uuid)
+                tts!!.synthesizeToFile(text, bundle!!, file, SYNTHESIZE_TO_FILE_PREFIX + uuid)
             }
 
         if (result == TextToSpeech.SUCCESS) {

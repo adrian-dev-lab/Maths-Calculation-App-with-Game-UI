@@ -3,10 +3,10 @@ import '../models/game_settings.dart';
 import 'home_screen.dart';
 import 'play_screen.dart';
 import 'settings_screen.dart';
+import 'calculation_settings_screen.dart';
 import '../services/storage_service.dart';
 import 'history_screen.dart';
 import 'beads_screen.dart';
-import 'adventure_screen.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -55,7 +55,6 @@ class _AppShellState extends State<AppShell> {
       case 0:
         return HomeScreen(
           settings: _settings,
-          onAdventureTap: () => _navigate(4),
           onCalculationTap: () => _navigate(1),
           onBeadsTap: () => _navigate(5),
           onHistoryTap: () => _navigate(3),
@@ -66,6 +65,18 @@ class _AppShellState extends State<AppShell> {
           settings: _settings,
           onPlayingStateChanged: _onPlayingStateChanged,
           onBack: _goHome,
+          onSettingsTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CalculationSettingsScreen(
+                  settings: _settings,
+                  onSettingsChanged: _updateSettings,
+                  onBack: () => Navigator.pop(context),
+                ),
+              ),
+            );
+          },
         );
       case 2:
         return SettingsScreen(
@@ -76,10 +87,8 @@ class _AppShellState extends State<AppShell> {
       case 3:
         return HistoryScreen(
           onBack: _goHome,
-        );
-      case 4:
-        return AdventureScreen(
-          onBack: _goHome,
+          onNumberPracticeTap: () => _navigate(1),
+          onBeadsPracticeTap: () => _navigate(5),
         );
       case 5:
         return BeadsScreen(
@@ -88,7 +97,6 @@ class _AppShellState extends State<AppShell> {
       default:
         return HomeScreen(
           settings: _settings,
-          onAdventureTap: () => _navigate(4),
           onCalculationTap: () => _navigate(1),
           onBeadsTap: () => _navigate(5),
           onHistoryTap: () => _navigate(3),

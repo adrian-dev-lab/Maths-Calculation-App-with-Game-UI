@@ -11,8 +11,15 @@ class PlayScreen extends StatefulWidget {
   final GameSettings settings;
   final ValueChanged<bool>? onPlayingStateChanged;
   final VoidCallback onBack;
+  final VoidCallback onSettingsTap;
 
-  const PlayScreen({super.key, required this.settings, this.onPlayingStateChanged, required this.onBack});
+  const PlayScreen({
+    super.key,
+    required this.settings,
+    this.onPlayingStateChanged,
+    required this.onBack,
+    required this.onSettingsTap,
+  });
 
   @override
   State<PlayScreen> createState() => _PlayScreenState();
@@ -30,6 +37,11 @@ class _PlayScreenState extends State<PlayScreen> {
   Timer? _timer;
   final _tts = TtsService();
 
+  String? _sessionId;
+  int _questionsPlayed = 0;
+  int _totalDurationSeconds = 0;
+  String _lastSessionSettings = '';
+
   final Map<GameSpeed, int> _speedMs = {
     GameSpeed.ultraFast: 500,
     GameSpeed.fast: 1000,
@@ -37,6 +49,16 @@ class _PlayScreenState extends State<PlayScreen> {
     GameSpeed.slow: 3000,
     GameSpeed.ultraSlow: 4500,
   };
+
+  double get _baseFontSize {
+    return switch (widget.settings.fontSize) {
+      DisplayFontSize.extraSmall => 60.0,
+      DisplayFontSize.small => 80.0,
+      DisplayFontSize.normal => 110.0,
+      DisplayFontSize.large => 140.0,
+      DisplayFontSize.extraLarge => 170.0,
+    };
+  }
 
   void _clearTimers() {
     _timer?.cancel();
@@ -52,7 +74,6 @@ class _PlayScreenState extends State<PlayScreen> {
     await _tts.init();
     await _tts.setupVoice(widget.settings.voiceGender);
   }
-
 
   @override
   void dispose() {
@@ -121,10 +142,31 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   Future<void> _saveHistory() async {
+    final currentSettings =
+        '${widget.settings.digits}|${widget.settings.count}|${widget.settings.speed.name}|${widget.settings.mode.name}';
+    if (_sessionId == null || _lastSessionSettings != currentSettings) {
+      _sessionId = DateTime.now().millisecondsSinceEpoch.toString();
+      _questionsPlayed = 0;
+      _totalDurationSeconds = 0;
+      _lastSessionSettings = currentSettings;
+    }
+
+    _questionsPlayed++;
+
+    final delayMs = _speedMs[widget.settings.speed] ?? 2000;
+    int currentDuration =
+        ((widget.settings.count * delayMs) +
+            (widget.settings.count - 1) * 400 +
+            500) ~/
+        1000;
+    if (currentDuration < 1) currentDuration = 1;
+    _totalDurationSeconds += currentDuration;
+
     final now = DateTime.now();
-    final dt = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
+    final dt =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}";
     final record = HistoryRecord(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: _sessionId!,
       datetime: dt,
       digits: widget.settings.digits,
       count: widget.settings.count,
@@ -133,6 +175,10 @@ class _PlayScreenState extends State<PlayScreen> {
       sequence: _sequence,
       answer: _answer,
       username: StorageService.loadUsername(),
+      gameType: 'Number',
+      questionsPlayed: _questionsPlayed,
+      durationInSeconds: _totalDurationSeconds,
+      operation: 'Mixed',
     );
     await DatabaseService.insertRecord(record);
   }
@@ -147,14 +193,15 @@ class _PlayScreenState extends State<PlayScreen> {
 
   void _showNextNumber(int delayMs) {
     if (!mounted) return;
-    
+
     final currentNum = _sequence[_currentIndex];
-    
+
     setState(() {
       _showNumber = true;
     });
 
-    if (widget.settings.mode == GameMode.audio || widget.settings.mode == GameMode.both) {
+    if (widget.settings.mode == GameMode.audio ||
+        widget.settings.mode == GameMode.both) {
       _tts.setSpeechRate(widget.settings.speed);
       _tts.speak(currentNum.toString());
     }
@@ -188,7 +235,9 @@ class _PlayScreenState extends State<PlayScreen> {
       _currentIndex = 0;
       _isAnswerRevealed = false;
     });
-    widget.onPlayingStateChanged?.call(false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) widget.onPlayingStateChanged?.call(false);
+    });
   }
 
   @override
@@ -204,225 +253,428 @@ class _PlayScreenState extends State<PlayScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            if (_phase == PlayPhase.playing) {
-              widget.onPlayingStateChanged?.call(false);
-            }
-            widget.onBack();
-          },
-        ),
-        title: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('MGA', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-            Text('Maths Genius Academy', style: TextStyle(color: Colors.grey, fontSize: 12)),
-          ],
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          // Settings pill row
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildSettingPill('Digits', widget.settings.digits.toString(), Icons.numbers, Colors.cyanAccent),
-                    const SizedBox(width: 8),
-                    _buildSettingPill('Count', widget.settings.count.toString(), Icons.repeat, Colors.orangeAccent),
-                    const SizedBox(width: 8),
-                    _buildSettingPill('Speed', widget.settings.speed.name.toUpperCase(), Icons.speed, Colors.pinkAccent),
-                    const SizedBox(width: 8),
-                    _buildSettingPill(
-                      'Mode', 
-                      widget.settings.mode.name.toUpperCase(), 
-                      widget.settings.mode == GameMode.audio ? Icons.volume_up :
-                      widget.settings.mode == GameMode.display ? Icons.desktop_windows : Icons.layers, 
-                      Colors.purpleAccent
-                    ),
-                  ],
-                ),
-              ),
-            ),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              if (_phase == PlayPhase.playing) {
+                widget.onPlayingStateChanged?.call(false);
+              }
+              widget.onBack();
+            },
           ),
-          
-          Expanded(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      child: Center(child: _buildFlashCardArea()),
+          title: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'MGA',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+              Text(
+                'Maths Genius Academy',
+                style: TextStyle(color: Colors.grey, fontSize: 12),
+              ),
+            ],
+          ),
+          actions: [
+            if (_phase != PlayPhase.playing)
+              Padding(
+                padding: const EdgeInsets.only(
+                  right: 16.0,
+                  top: 8.0,
+                  bottom: 8.0,
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.settings,
+                      color: Colors.white,
+                      size: 22,
                     ),
-                    const SizedBox(height: 32),
-                    Center(child: _buildButtons()),
-                  ],
+                    onPressed: widget.onSettingsTap,
+                    padding: EdgeInsets.zero,
+                  ),
+                ),
+              ),
+          ],
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+        ),
+        body: Column(
+          children: [
+            // Settings pill row
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: MediaQuery.of(context).size.width > 600
+                        ? 500
+                        : 320,
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          _buildSettingPill(
+                            context,
+                            'Digits',
+                            widget.settings.digits.toString(),
+                            Icons.numbers,
+                            Colors.cyanAccent,
+                          ),
+                          const SizedBox(width: 8),
+                          _buildSettingPill(
+                            context,
+                            'Count',
+                            widget.settings.count.toString(),
+                            Icons.repeat,
+                            Colors.orangeAccent,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          _buildSettingPill(
+                            context,
+                            'Speed',
+                            widget.settings.speed.name.toUpperCase(),
+                            Icons.speed,
+                            Colors.pinkAccent,
+                          ),
+                          const SizedBox(width: 8),
+                          _buildSettingPill(
+                            context,
+                            'Mode',
+                            widget.settings.mode.name.toUpperCase(),
+                            widget.settings.mode == GameMode.audio
+                                ? Icons.volume_up
+                                : widget.settings.mode == GameMode.display
+                                ? Icons.desktop_windows
+                                : Icons.layers,
+                            Colors.purpleAccent,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          )
-        ],
-      ),
-      ),
-    );
-  }
 
-  Widget _buildSettingPill(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.1),
-            blurRadius: 8,
-            spreadRadius: 0,
-          )
-        ],
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 14),
-          const SizedBox(width: 6),
-          Text('$label: ', style: const TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
-          Text(value, style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w900, letterSpacing: 1.1)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFlashCardArea() {
-    return AspectRatio(
-      aspectRatio: 16 / 9,
-      child: Container(
-        width: double.infinity,
-        constraints: const BoxConstraints(maxWidth: 600),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1A0B2E), // Solid deep purple color to match the mask
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.cyanAccent.withValues(alpha: 0.3), width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.cyanAccent.withValues(alpha: 0.1),
-              blurRadius: 30,
-              spreadRadius: 2,
-            ),
-            BoxShadow(
-              color: Colors.purpleAccent.withValues(alpha: 0.15),
-              blurRadius: 60,
-              spreadRadius: 5,
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    left: 16.0,
+                    right: 16.0,
+                    top: 16.0,
+                    bottom: MediaQuery.of(context).size.width > 600
+                        ? 80.0
+                        : 64.0,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Center(child: _buildFlashCardArea(context)),
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.width > 600
+                            ? 32
+                            : 16,
+                      ),
+                      Center(child: _buildButtons()),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ],
         ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // HUD Corner Accents
-            Positioned(top: 16, left: 16, child: _buildHudCorner(true, true)),
-            Positioned(top: 16, right: 16, child: _buildHudCorner(true, false)),
-            Positioned(bottom: 16, left: 16, child: _buildHudCorner(false, true)),
-            Positioned(bottom: 16, right: 16, child: _buildHudCorner(false, false)),
-            // Top and Bottom HUD scanlines
-            Positioned(
-              top: 0,
-              child: Container(width: 200, height: 3, decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: [Colors.transparent, Colors.cyanAccent, Colors.transparent]),
-                boxShadow: [BoxShadow(color: Colors.cyanAccent, blurRadius: 10)],
-              )),
-            ),
-            Positioned(
-              bottom: 0,
-              child: Container(width: 200, height: 3, decoration: const BoxDecoration(
-                gradient: LinearGradient(colors: [Colors.transparent, Colors.pinkAccent, Colors.transparent]),
-                boxShadow: [BoxShadow(color: Colors.pinkAccent, blurRadius: 10)],
-              )),
-            ),
-            if (_phase == PlayPhase.idle)
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Image.asset(
-                  'assets/images/mascot_home.png',
-                  width: 150,
-                  height: 150,
-                  fit: BoxFit.contain,
+      ),
+    );
+  }
+
+  Widget _buildSettingPill(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
+    final isLarge = MediaQuery.of(context).size.width > 600;
+    return Expanded(
+      child: GestureDetector(
+        onTap: widget.onSettingsTap,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: isLarge
+              ? const EdgeInsets.symmetric(horizontal: 16, vertical: 12)
+              : const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: color.withValues(alpha: 0.3)),
+            boxShadow: [
+              BoxShadow(
+                color: color.withValues(alpha: 0.1),
+                blurRadius: 8,
+                spreadRadius: 0,
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: isLarge ? 18 : 14),
+              const SizedBox(width: 6),
+              Text(
+                '$label: ',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: isLarge ? 14 : 12,
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 12),
-                const Text('Ready to test your math skills?', style: TextStyle(color: Colors.grey)),
-              ],
+              ),
+              Expanded(
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: isLarge ? 16 : 13,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.1,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Icon(
+                Icons.keyboard_arrow_down,
+                color: color.withValues(alpha: 0.7),
+                size: isLarge ? 20 : 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFlashCardArea(BuildContext context) {
+    final isLarge = MediaQuery.of(context).size.width > 600;
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 800),
+      child: AspectRatio(
+        aspectRatio: isLarge ? 16 / 9 : 4 / 3,
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: const Color(
+              0xFF1A0B2E,
+            ), // Solid deep purple color to match the mask
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: Colors.cyanAccent.withValues(alpha: 0.3),
+              width: 2,
             ),
-          if (_phase == PlayPhase.playing && !_showNumber)
-            const CircularProgressIndicator(),
-          if (_phase == PlayPhase.playing && _showNumber)
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.cyanAccent.withValues(alpha: 0.1),
+                blurRadius: 30,
+                spreadRadius: 2,
+              ),
+              BoxShadow(
+                color: Colors.purpleAccent.withValues(alpha: 0.15),
+                blurRadius: 60,
+                spreadRadius: 5,
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                if (widget.settings.mode == GameMode.audio)
-                  const Icon(Icons.volume_up, size: 80, color: Colors.amber)
-                else
-                  Text(
-                    _sequence[_currentIndex].toString(),
-                    style: TextStyle(
-                      fontSize: widget.settings.digits >= 3 ? 80 : 110,
-                      fontWeight: FontWeight.w900,
-                      color: _sequence[_currentIndex] < 0 ? Colors.red : Colors.white,
+                // HUD Corner Accents
+                Positioned(
+                  top: 16,
+                  left: 16,
+                  child: _buildHudCorner(true, true),
+                ),
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: _buildHudCorner(true, false),
+                ),
+                Positioned(
+                  bottom: 16,
+                  left: 16,
+                  child: _buildHudCorner(false, true),
+                ),
+                Positioned(
+                  bottom: 16,
+                  right: 16,
+                  child: _buildHudCorner(false, false),
+                ),
+                // Top and Bottom HUD scanlines
+                Positioned(
+                  top: 0,
+                  child: Container(
+                    width: 200,
+                    height: 3,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Colors.cyanAccent,
+                          Colors.transparent,
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(color: Colors.cyanAccent, blurRadius: 10),
+                      ],
                     ),
                   ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(_sequence.length, (index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: 6, height: 6,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: index < _currentIndex ? Colors.blue : 
-                               index == _currentIndex ? Colors.white : const Color(0xFF2E3150),
+                ),
+                Positioned(
+                  bottom: 0,
+                  child: Container(
+                    width: 200,
+                    height: 3,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.transparent,
+                          Colors.pinkAccent,
+                          Colors.transparent,
+                        ],
                       ),
-                    );
-                  }),
-                )
+                      boxShadow: [
+                        BoxShadow(color: Colors.pinkAccent, blurRadius: 10),
+                      ],
+                    ),
+                  ),
+                ),
+                if (_phase == PlayPhase.idle)
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Image.asset(
+                          'assets/images/mascot_home.png',
+                          width: isLarge ? 280 : 180,
+                          height: isLarge ? 280 : 180,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Ready to test your math skills?',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: isLarge ? 18 : 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                if (_phase == PlayPhase.playing && !_showNumber)
+                  const CircularProgressIndicator(),
+                if (_phase == PlayPhase.playing && _showNumber)
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (widget.settings.mode == GameMode.audio)
+                        const Icon(
+                          Icons.volume_up,
+                          size: 80,
+                          color: Colors.amber,
+                        )
+                      else
+                        Text(
+                          _sequence[_currentIndex].toString(),
+                          style: TextStyle(
+                            fontSize: _baseFontSize,
+                            fontWeight: FontWeight.w900,
+                            color: _sequence[_currentIndex] < 0
+                                ? Colors.red
+                                : Colors.white,
+                          ),
+                        ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(_sequence.length, (index) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: index < _currentIndex
+                                  ? Colors.blue
+                                  : index == _currentIndex
+                                  ? Colors.white
+                                  : const Color(0xFF2E3150),
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
+                  ),
+                if (_phase == PlayPhase.answer)
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '= ?',
+                        style: TextStyle(
+                          color: Colors.grey,
+                          fontSize: _baseFontSize * 0.25,
+                          letterSpacing: 2,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      if (!_isAnswerRevealed)
+                        Text(
+                          '?',
+                          style: TextStyle(
+                            color: Colors.amber,
+                            fontSize: _baseFontSize * 0.5,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        )
+                      else
+                        Column(
+                          children: [
+                            Text(
+                              '$_answer',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontSize: _baseFontSize * 0.8,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '${_sequence.map((n) => n > 0 && _sequence.indexOf(n) > 0 ? '+$n' : n).join(' ')} = $_answer',
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
               ],
             ),
-          if (_phase == PlayPhase.answer)
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('= ?', style: TextStyle(color: Colors.grey, fontSize: 16, letterSpacing: 2)),
-                const SizedBox(height: 16),
-                if (!_isAnswerRevealed)
-                  const Text('?', style: TextStyle(color: Colors.amber, fontSize: 40, fontWeight: FontWeight.w900))
-                else
-                  Column(
-                    children: [
-                      Text('$_answer', style: const TextStyle(color: Colors.green, fontSize: 80, fontWeight: FontWeight.w900)),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${_sequence.map((n) => n > 0 && _sequence.indexOf(n) > 0 ? '+$n' : n).join(' ')} = $_answer',
-                        style: const TextStyle(color: Colors.grey, fontSize: 14),
-                      )
-                    ],
-                  )
-              ],
-            )
-        ],
-      ),
-      ),
+          ),
+        ),
       ),
     );
   }
@@ -433,10 +685,18 @@ class _PlayScreenState extends State<PlayScreen> {
       height: 24,
       decoration: BoxDecoration(
         border: Border(
-          top: isTop ? const BorderSide(color: Colors.cyanAccent, width: 3) : BorderSide.none,
-          bottom: !isTop ? const BorderSide(color: Colors.cyanAccent, width: 3) : BorderSide.none,
-          left: isLeft ? const BorderSide(color: Colors.cyanAccent, width: 3) : BorderSide.none,
-          right: !isLeft ? const BorderSide(color: Colors.cyanAccent, width: 3) : BorderSide.none,
+          top: isTop
+              ? const BorderSide(color: Colors.cyanAccent, width: 3)
+              : BorderSide.none,
+          bottom: !isTop
+              ? const BorderSide(color: Colors.cyanAccent, width: 3)
+              : BorderSide.none,
+          left: isLeft
+              ? const BorderSide(color: Colors.cyanAccent, width: 3)
+              : BorderSide.none,
+          right: !isLeft
+              ? const BorderSide(color: Colors.cyanAccent, width: 3)
+              : BorderSide.none,
         ),
       ),
     );
@@ -444,7 +704,7 @@ class _PlayScreenState extends State<PlayScreen> {
 
   Widget _buildButtons() {
     return Container(
-      constraints: const BoxConstraints(maxWidth: 400),
+      constraints: const BoxConstraints(maxWidth: 280),
       child: Column(
         children: [
           if (_phase == PlayPhase.idle)
@@ -543,7 +803,10 @@ class _PlayGameButtonState extends State<_PlayGameButton> {
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: widget.colors.first.withValues(alpha: 0.5), width: 1.5),
+                    border: Border.all(
+                      color: widget.colors.first.withValues(alpha: 0.5),
+                      width: 1.5,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: widget.colors.first.withValues(alpha: 0.4),
@@ -583,5 +846,3 @@ class _PlayGameButtonState extends State<_PlayGameButton> {
     );
   }
 }
-
-

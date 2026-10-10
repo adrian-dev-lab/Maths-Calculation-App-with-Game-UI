@@ -12,7 +12,14 @@ val newBuildDir: Directory =
 rootProject.layout.buildDirectory.value(newBuildDir)
 
 subprojects {
-    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
+    // Android test tasks require sources and build outputs on the same drive.
+    // Pub-cache plugins can live on a different Windows drive from this app.
+    val sameDrive = project.projectDir.toPath().root == newBuildDir.asFile.toPath().root
+    val newSubprojectBuildDir: Directory = if (sameDrive) {
+        newBuildDir.dir(project.name)
+    } else {
+        project.layout.projectDirectory.dir("build")
+    }
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
 subprojects {
@@ -21,4 +28,5 @@ subprojects {
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
+    delete(subprojects.map { it.layout.buildDirectory })
 }

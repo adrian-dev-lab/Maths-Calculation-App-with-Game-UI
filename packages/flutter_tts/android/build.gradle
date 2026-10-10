@@ -1,10 +1,9 @@
 def args = ["-Xlint:deprecation"]
 
-group 'com.eyedeadevelopment.fluttertts'
-version '1.0-SNAPSHOT'
+group = 'com.eyedeadevelopment.fluttertts'
+version = '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '2.2.20'
     repositories {
         google()
         mavenCentral()
@@ -12,7 +11,6 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:8.13.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -28,20 +26,17 @@ project.getTasks().withType(JavaCompile).configureEach {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
 
 android {
-    compileSdk 36
-    if (project.android.hasProperty("namespace")) {
-        namespace 'com.eyedeadevelopment.fluttertts'
-    }
+    compileSdk = 36
+    namespace = 'com.eyedeadevelopment.fluttertts'
 
     defaultConfig {
-        minSdkVersion 24
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        minSdk = 24
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    lintOptions {
+    lint {
         disable 'InvalidPackage'
         disable 'GradleDependency'
     }
@@ -51,12 +46,15 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
-    }
 }
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+afterEvaluate {
+    if (project.plugins.hasPlugin("org.jetbrains.kotlin.android")) {
+        project.extensions.configure("kotlin") {
+            it.compilerOptions {
+                jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+            }
+        }
+    }
 }
 repositories {
     mavenCentral()

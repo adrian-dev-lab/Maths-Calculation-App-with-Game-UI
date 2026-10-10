@@ -21,7 +21,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5DD62953-CBF3-33BE-BD19-BD70BB9DDA18}</ProjectGuid>
+    <ProjectGuid>{13B7B69D-8090-399B-A416-E4DABFADC3F1}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0.26100.0</WindowsTargetPlatformVersion>
     <Platform>x64</Platform>
@@ -88,11 +88,11 @@
     </Midl>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <CustomBuild Include="D:\Flash Calc\flutter-ui-design-v2\windows\runner\CMakeLists.txt">
+    <CustomBuild Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\windows\runner\CMakeLists.txt">
       <UseUtf8Encoding>Always</UseUtf8Encoding>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Flash Calc/flutter-ui-design-v2/windows/runner/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule D:/Game Dev/Maths-Calculation-App-with-Game-UI/windows/runner/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
-"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SD:/Flash Calc/flutter-ui-design-v2/windows" "-BD:/Flash Calc/flutter-ui-design-v2/build/windows/x64" --check-stamp-file "D:/Flash Calc/flutter-ui-design-v2/build/windows/x64/runner/CMakeFiles/generate.stamp"
+E:\VisualStudio\2026\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe "-SD:/Game Dev/Maths-Calculation-App-with-Game-UI/windows" "-BD:/Game Dev/Maths-Calculation-App-with-Game-UI/build/windows/x64" --check-stamp-file "D:/Game Dev/Maths-Calculation-App-with-Game-UI/build/windows/x64/runner/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -101,11 +101,11 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\runner\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\runner\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Building Custom Rule D:/Flash Calc/flutter-ui-design-v2/windows/runner/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">Building Custom Rule D:/Game Dev/Maths-Calculation-App-with-Game-UI/windows/runner/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">setlocal
-"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SD:/Flash Calc/flutter-ui-design-v2/windows" "-BD:/Flash Calc/flutter-ui-design-v2/build/windows/x64" --check-stamp-file "D:/Flash Calc/flutter-ui-design-v2/build/windows/x64/runner/CMakeFiles/generate.stamp"
+E:\VisualStudio\2026\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe "-SD:/Game Dev/Maths-Calculation-App-with-Game-UI/windows" "-BD:/Game Dev/Maths-Calculation-App-with-Game-UI/build/windows/x64" --check-stamp-file "D:/Game Dev/Maths-Calculation-App-with-Game-UI/build/windows/x64/runner/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -114,11 +114,11 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\runner\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\runner\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">false</LinkObjects>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Flash Calc/flutter-ui-design-v2/windows/runner/CMakeLists.txt</Message>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule D:/Game Dev/Maths-Calculation-App-with-Game-UI/windows/runner/CMakeLists.txt</Message>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
-"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" "-SD:/Flash Calc/flutter-ui-design-v2/windows" "-BD:/Flash Calc/flutter-ui-design-v2/build/windows/x64" --check-stamp-file "D:/Flash Calc/flutter-ui-design-v2/build/windows/x64/runner/CMakeFiles/generate.stamp"
+E:\VisualStudio\2026\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe "-SD:/Game Dev/Maths-Calculation-App-with-Game-UI/windows" "-BD:/Game Dev/Maths-Calculation-App-with-Game-UI/build/windows/x64" --check-stamp-file "D:/Game Dev/Maths-Calculation-App-with-Game-UI/build/windows/x64/runner/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -127,7 +127,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd</Command>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(AdditionalInputs)</AdditionalInputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\runner\CMakeFiles\generate.stamp</Outputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\runner\CMakeFiles\generate.stamp</Outputs>
       <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
     </CustomBuild>
   </ItemGroup>
@@ -135,14 +135,14 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\ZERO_CHECK.vcxproj">
-      <Project>{68CA5E86-6B55-3274-AEC9-13E5D84B8A5F}</Project>
+    <ProjectReference Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\ZERO_CHECK.vcxproj">
+      <Project>{780C2DC6-0406-3F16-9D70-62F3A1FC1207}</Project>
       <Name>ZERO_CHECK</Name>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </ProjectReference>
-    <ProjectReference Include="D:\Flash Calc\flutter-ui-design-v2\build\windows\x64\runner\flutter_ui_design.vcxproj">
-      <Project>{DF8CEAC9-6FB1-316F-AFD2-6A330DA374FF}</Project>
+    <ProjectReference Include="D:\Game Dev\Maths-Calculation-App-with-Game-UI\build\windows\x64\runner\flutter_ui_design.vcxproj">
+      <Project>{F4C7FD13-FFAA-3AE3-895B-3D1674A9D35E}</Project>
       <Name>flutter_ui_design</Name>
     </ProjectReference>
   </ItemGroup>

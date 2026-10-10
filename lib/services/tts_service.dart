@@ -28,12 +28,58 @@ class TtsService {
   /// Set voice based on gender setting. Fire-and-forget, never throws.
   Future<void> setupVoice(TtsVoiceGender gender) async {
     try {
-      // Android / Xiaomi TTS engines often don't have predictable 'male' or 'female' voice names.
-      // The most reliable cross-platform way to simulate gender is by adjusting the pitch.
+      final voices = await _tts.getVoices;
+      if (voices != null && voices is List) {
+        String targetGender = gender == TtsVoiceGender.female ? "female" : "male";
+        Map<dynamic, dynamic>? bestVoice;
+        
+        // First try to match by explicit gender attribute
+        for (var v in voices) {
+          if (v is Map) {
+            final loc = v["locale"]?.toString() ?? "";
+            final g = v["gender"]?.toString() ?? "";
+            if (loc.startsWith("en") && g == targetGender) {
+              bestVoice = v;
+              break;
+            }
+          }
+        }
+        
+        // Fallback: match by known voice names
+        if (bestVoice == null) {
+          for (var v in voices) {
+            if (v is Map) {
+              final loc = v["locale"]?.toString() ?? "";
+              final name = v["name"]?.toString().toLowerCase() ?? "";
+              if (loc.startsWith("en")) {
+                if (gender == TtsVoiceGender.female && (name.contains("zira") || name.contains("samantha") || name.contains("female"))) {
+                  bestVoice = v;
+                  break;
+                }
+                if (gender == TtsVoiceGender.male && (name.contains("david") || name.contains("mark") || name.contains("alex") || name.contains("male"))) {
+                  bestVoice = v;
+                  break;
+                }
+              }
+            }
+          }
+        }
+
+        if (bestVoice != null) {
+          await _tts.setVoice({
+            "name": bestVoice["name"],
+            "locale": bestVoice["locale"]
+          });
+          await _tts.setPitch(1.0); // Reset pitch for native voice
+          return;
+        }
+      }
+
+      // Final Fallback for platforms with unpredictable TTS engines (Android/Xiaomi)
       if (gender == TtsVoiceGender.female) {
-        await _tts.setPitch(1.2); // Higher pitch for female
+        await _tts.setPitch(1.2);
       } else {
-        await _tts.setPitch(0.65); // Lower pitch for male
+        await _tts.setPitch(0.65);
       }
     } catch (e) {
       debugPrint("[TtsService] setupVoice error: $e");

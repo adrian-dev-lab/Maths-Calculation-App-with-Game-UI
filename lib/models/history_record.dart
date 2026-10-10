@@ -10,6 +10,10 @@ class HistoryRecord {
   final List<int> sequence;
   final int answer;
   final String username;
+  final String gameType;
+  final int questionsPlayed;
+  final int durationInSeconds;
+  final String operation;
 
   const HistoryRecord({
     required this.id,
@@ -21,6 +25,10 @@ class HistoryRecord {
     required this.sequence,
     required this.answer,
     required this.username,
+    this.gameType = 'Number',
+    this.questionsPlayed = 1,
+    this.durationInSeconds = 0,
+    this.operation = 'Addition',
   });
 }
 
