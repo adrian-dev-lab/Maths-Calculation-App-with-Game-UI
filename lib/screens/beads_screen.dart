@@ -278,8 +278,17 @@ class _BeadsScreenState extends State<BeadsScreen> {
     );
   }
 
-  Widget _buildContent() {
+  Widget _buildContent({double? availableHeight}) {
     if (currentState == FlashState.idle) {
+      final bool compact =
+          availableHeight != null && availableHeight < 850;
+      final bool veryCompact =
+          availableHeight != null && availableHeight < 540;
+      final double? heroMaxHeight = compact
+          ? (veryCompact
+              ? 105.0
+              : (availableHeight * 0.28).clamp(160.0, 220.0).toDouble())
+          : null;
       return Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 750),
@@ -288,10 +297,10 @@ class _BeadsScreenState extends State<BeadsScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 20),
+                SizedBox(height: compact ? 8 : 20),
                 // Decorative Abacus Icon Area
-                const _ReadyFinalHero(),
-                const SizedBox(height: 22),
+                _ReadyFinalHero(maxHeight: heroMaxHeight),
+                SizedBox(height: compact ? 12 : 22),
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: RichText(
@@ -311,8 +320,8 @@ class _BeadsScreenState extends State<BeadsScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                const Text(
+                SizedBox(height: compact ? 10 : 16),
+                if (!veryCompact) const Text(
                   'Watch the bead patterns and\ncalculate mentally.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -321,7 +330,7 @@ class _BeadsScreenState extends State<BeadsScreen> {
                     height: 1.4,
                   ),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: compact ? 14 : 40),
                 
                 // Settings Grid
                 // Settings Grid
@@ -346,7 +355,7 @@ class _BeadsScreenState extends State<BeadsScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: compact ? 10 : 16),
                     Row(
                       children: [
                         _buildSettingItem(
@@ -369,7 +378,7 @@ class _BeadsScreenState extends State<BeadsScreen> {
                   ],
                 ),
                 
-                const SizedBox(height: 40),
+                SizedBox(height: compact ? 14 : 40),
                 
                 // Start Button
                 SizedBox(
@@ -418,7 +427,7 @@ class _BeadsScreenState extends State<BeadsScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: compact ? 10 : 24),
               ],
             ),
           ),
@@ -583,7 +592,14 @@ class _BeadsScreenState extends State<BeadsScreen> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                child: _buildContent(),
+                // The body extends behind the AppBar, so give the idle
+                // controls a safe top offset. Other play states are unchanged.
+                padding: currentState == FlashState.idle
+                    ? const EdgeInsets.only(top: 64, bottom: 12)
+                    : EdgeInsets.zero,
+                child: _buildContent(
+                  availableHeight: MediaQuery.sizeOf(context).height,
+                ),
               ),
             ),
           ),
@@ -2722,7 +2738,9 @@ class _FacetedBeadPainter
 // ============================================================
 // EXACT FINAL HERO CODE
 class _ReadyFinalHero extends StatelessWidget {
-  const _ReadyFinalHero();
+  final double? maxHeight;
+
+  const _ReadyFinalHero({this.maxHeight});
 
   @override
   Widget build(BuildContext context) {
@@ -2732,8 +2750,11 @@ class _ReadyFinalHero extends StatelessWidget {
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
 
-        final heroWidth =
-            (availableWidth * 0.88).clamp(260.0, 600.0);
+        final double normalHeroWidth =
+            (availableWidth * 0.88).clamp(260.0, 600.0).toDouble();
+        final double heroWidth = maxHeight == null
+            ? normalHeroWidth
+            : math.min(normalHeroWidth, maxHeight! / 0.57);
 
         final heroHeight = heroWidth * 0.57;
 
