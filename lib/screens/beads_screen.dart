@@ -278,12 +278,148 @@ class _BeadsScreenState extends State<BeadsScreen> {
     );
   }
 
+  // Compact landscape phones have enough horizontal room, but not enough
+  // vertical room for the tablet-style column of hero, settings, and Start.
+  // Keep the settings and Start visible together without altering gameplay.
+  Widget _buildLandscapePhoneIdle() {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 750),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const _ReadyFinalHero(maxHeight: 104),
+                    const SizedBox(height: 8),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontSize: baseFontSize * 1.3,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                          children: const [
+                            TextSpan(text: 'Ready to '),
+                            TextSpan(
+                              text: 'start?',
+                              style: TextStyle(color: Color(0xFFA155FF)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                flex: 6,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        _buildSettingItem(
+                          Icons.desktop_windows_rounded,
+                          'Display',
+                          '$sequenceLength',
+                          const Color(0xFF332066),
+                          const Color(0xFF8660EB),
+                        ),
+                        const SizedBox(width: 10),
+                        _buildSettingItem(
+                          Icons.speed_rounded,
+                          'Speed',
+                          speed,
+                          const Color(0xFF1C423E),
+                          const Color(0xFF49DCA4),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        _buildSettingItem(
+                          Icons.calculate_rounded,
+                          'Operation',
+                          operation,
+                          const Color(0xFF4C2A24),
+                          const Color(0xFFE28B36),
+                        ),
+                        const SizedBox(width: 10),
+                        _buildSettingItem(
+                          Icons.view_stream_rounded,
+                          'Group',
+                          '$digitsCount Beads',
+                          const Color(0xFF45193B),
+                          const Color(0xFFE954B5),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFA155FF), Color(0xFF6B20FF)],
+                          ),
+                        ),
+                        child: ElevatedButton.icon(
+                          onPressed: _startFlash,
+                          icon: const Icon(Icons.play_arrow_rounded, size: 25),
+                          label: const Text(
+                            'Start',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            foregroundColor: Colors.white,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildContent({double? availableHeight}) {
     if (currentState == FlashState.idle) {
       final bool compact =
           availableHeight != null && availableHeight < 850;
       final bool veryCompact =
           availableHeight != null && availableHeight < 540;
+      // Only change the short, wide phone layout. Tablets retain the
+      // previously verified v2 layout; portrait/small widths stay scrollable.
+      final viewWidth = MediaQuery.sizeOf(context).width;
+      if (availableHeight != null && availableHeight < 540 &&
+          viewWidth > availableHeight && viewWidth >= 560) {
+        return _buildLandscapePhoneIdle();
+      }
       final double? heroMaxHeight = compact
           ? (veryCompact
               ? 105.0
@@ -623,6 +759,102 @@ class _BeadsQuestionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewSize = MediaQuery.sizeOf(context);
+    // Keep the question and its action visible on short landscape phones.
+    // Tablet and portrait layouts remain unchanged.
+    if (viewSize.height < 540 &&
+        viewSize.width > viewSize.height &&
+        viewSize.width >= 560) {
+      return Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 780),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(24, 64, 24, 12),
+            child: Row(
+              children: [
+                const Expanded(
+                  flex: 4,
+                  child: AspectRatio(
+                    aspectRatio: 584 / 398,
+                    child: BeadsMysteryVisual(),
+                  ),
+                ),
+                const SizedBox(width: 24),
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'What is the answer?',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFFF8F5FF),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      const Text(
+                        'Calculate in your head.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(0xFFC9BDD9),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(25),
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFFAA4BFF),
+                                Color(0xFF8731FF),
+                                Color(0xFF5E28FF),
+                              ],
+                            ),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(25),
+                              onTap: onShowAnswer,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.visibility_outlined,
+                                      color: Colors.white, size: 22),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Show Answer',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenSize = MediaQuery.sizeOf(context);
@@ -817,6 +1049,60 @@ class _BeadsAnswerResult extends StatelessWidget {
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (match) => '${match[1]},',
         );
+
+        // On short landscape phones, fit the result and Play Again action
+        // side by side rather than hiding them below a tall hero.
+        if (screenSize.height < 540 &&
+            screenSize.width > screenSize.height &&
+            screenSize.width >= 560) {
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 780),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(24, 64, 24, 12),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      flex: 4,
+                      child: _ResultHero(),
+                    ),
+                    const SizedBox(width: 24),
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Answer',
+                            style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFFF6F1FF),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          _AnswerCard(
+                            formattedAnswer: formattedAnswer,
+                            height: 130,
+                            answerFontSize: 76,
+                          ),
+                          const SizedBox(height: 18),
+                          SizedBox(
+                            width: double.infinity,
+                            child: _PrimaryGradientButton(
+                              height: 50,
+                              onPressed: onPlayAgain,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
 
         // Empty hero area for the exact trophy asset we will add later.
 
