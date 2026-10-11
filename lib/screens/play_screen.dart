@@ -202,8 +202,7 @@ class _PlayScreenState extends State<PlayScreen> {
 
     if (widget.settings.mode == GameMode.audio ||
         widget.settings.mode == GameMode.both) {
-      _tts.setSpeechRate(widget.settings.speed);
-      _tts.speak(currentNum.toString());
+      _tts.speakNumber(currentNum.toString(), widget.settings.speed);
     }
 
     _timer = Timer(Duration(milliseconds: delayMs), () {
