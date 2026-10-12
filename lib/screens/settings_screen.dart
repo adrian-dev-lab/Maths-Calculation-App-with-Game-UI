@@ -29,13 +29,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _updateSettings(GameSettings newSettings) {
+    // Keep edits local until the user explicitly saves.
     setState(() {
       _currentSettings = newSettings;
+      _saved = false;
     });
-    widget.onSettingsChanged(newSettings);
   }
 
   void _handleSave() {
+    if (_saved) return;
+    // This is the only path that updates the parent and persists settings.
+    widget.onSettingsChanged(_currentSettings);
     setState(() {
       _saved = true;
     });
