@@ -241,6 +241,15 @@ class _PlayScreenState extends State<PlayScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final viewport = MediaQuery.sizeOf(context);
+    // Small landscape phones have very little logical height, especially
+    // at higher display densities. Keep game settings to one accessible row
+    // instead of squeezing the number card below a two-row settings grid.
+    final shortPhoneLandscape =
+        viewport.width > viewport.height &&
+        viewport.shortestSide < 600 &&
+        viewport.height < 350;
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -252,6 +261,7 @@ class _PlayScreenState extends State<PlayScreen> {
       child: Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(
+          toolbarHeight: shortPhoneLandscape ? 48.0 : null,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
@@ -304,10 +314,74 @@ class _PlayScreenState extends State<PlayScreen> {
         ),
         body: Column(
           children: [
-            // Settings pill row
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Center(
+            // Keep all four settings readable and accessible on tiny
+            // landscape displays without consuming two rows of game space.
+            if (shortPhoneLandscape)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(10, 2, 10, 4),
+                child: Semantics(
+                  button: true,
+                  label:
+                      'Calculation settings: '
+                      '${widget.settings.digits} digits, '
+                      '${widget.settings.count} numbers, '
+                      '${widget.settings.speed.name} speed, '
+                      '${widget.settings.mode.name} mode',
+                  child: GestureDetector(
+                    onTap: widget.onSettingsTap,
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      height: 44,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.cyanAccent.withValues(alpha: 0.09),
+                        border: Border.all(
+                          color: Colors.cyanAccent.withValues(alpha: 0.28),
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.tune,
+                            size: 18,
+                            color: Colors.cyanAccent,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerLeft,
+                              child: Text(
+                                'DIGITS ${widget.settings.digits}  ·  '
+                                'COUNT ${widget.settings.count}  ·  '
+                                '${widget.settings.speed.name.toUpperCase()}  ·  '
+                                '${widget.settings.mode.name.toUpperCase()}',
+                                maxLines: 1,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Icon(
+                            Icons.chevron_right,
+                            size: 18,
+                            color: Colors.cyanAccent,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Center(
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width > 600
@@ -368,7 +442,70 @@ class _PlayScreenState extends State<PlayScreen> {
             Expanded(
               child: LayoutBuilder(
                 builder: (context, space) {
-                  final mobile = MediaQuery.sizeOf(context).width <= 600;
+                  // Use the short side to detect compact landscape phones.
+                  // Width-only checks wrongly classify some phones as desktop.
+                  final viewport = MediaQuery.sizeOf(context);
+                  final compactPhoneLandscape =
+                      viewport.width > viewport.height &&
+                      viewport.shortestSide < 600;
+
+                  if (compactPhoneLandscape) {
+                    // Keep the flash card and primary action side-by-side.
+                    // Stacking both vertically on short landscape screens
+                    // compresses the flash card until numbers are unreadable.
+                    return Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        shortPhoneLandscape ? 8 : 12,
+                        shortPhoneLandscape ? 2 : 4,
+                        shortPhoneLandscape ? 8 : 12,
+                        shortPhoneLandscape ? 6 : 12,
+                      ),
+                      child: LayoutBuilder(
+                        builder: (context, rowSpace) {
+                          final gap = shortPhoneLandscape ? 8.0 : 10.0;
+                          // The card and action rail share the SAME measured
+                          // height, so the button tracks the card's lower edge
+                          // instead of floating near the top of the screen.
+                          final cardWidthBudget =
+                              (rowSpace.maxWidth - gap) * 0.72;
+                          final cardHeight = min(
+                            rowSpace.maxHeight,
+                            cardWidthBudget / (16 / 9),
+                          );
+
+                          return Center(
+                            child: SizedBox(
+                              width: rowSpace.maxWidth,
+                              height: cardHeight,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 72,
+                                    child: Center(
+                                      child: _buildFlashCardArea(context),
+                                    ),
+                                  ),
+                                  SizedBox(width: gap),
+                                  Expanded(
+                                    flex: 28,
+                                    child: Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: _buildButtons(
+                                        compact: true,
+                                        compactSmall: shortPhoneLandscape,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  }
+
+                  final mobile = viewport.width <= 600;
                   if (!mobile) {
                     // Keep the existing Windows / large-screen composition.
                     return Center(
@@ -706,11 +843,15 @@ class _PlayScreenState extends State<PlayScreen> {
                                 ),
                               ),
                               const SizedBox(height: 8),
-                              Text(
-                                '${_sequence.map((n) => n > 0 && _sequence.indexOf(n) > 0 ? '+$n' : n).join(' ')} = $_answer',
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 10),
+                                child: Text(
+                                  '${_sequence.map((n) => n > 0 && _sequence.indexOf(n) > 0 ? '+$n' : n).join(' ')} = $_answer',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: Colors.grey,
+                                    fontSize: 14,
+                                  ),
                                 ),
                               ),
                             ],
@@ -764,15 +905,20 @@ class _PlayScreenState extends State<PlayScreen> {
     );
   }
 
-  Widget _buildButtons() {
+  Widget _buildButtons({bool compact = false, bool compactSmall = false}) {
     return Container(
-      constraints: const BoxConstraints(maxWidth: 280),
+      constraints: BoxConstraints(
+        maxWidth: compact ? (compactSmall ? 112.0 : 140.0) : 280.0,
+      ),
       child: Column(
+        mainAxisSize: compact ? MainAxisSize.min : MainAxisSize.max,
         children: [
           if (_phase == PlayPhase.idle)
             _PlayGameButton(
               onPressed: _startGame,
               label: 'Start',
+              compact: compact,
+              compactSmall: compactSmall,
               icon: Icons.rocket_launch,
               colors: const [Colors.pinkAccent, Colors.deepOrangeAccent],
             ),
@@ -780,6 +926,8 @@ class _PlayScreenState extends State<PlayScreen> {
             _PlayGameButton(
               onPressed: _reset,
               label: 'Reset',
+              compact: compact,
+              compactSmall: compactSmall,
               icon: Icons.refresh,
               colors: const [Colors.purpleAccent, Colors.deepPurpleAccent],
             ),
@@ -788,6 +936,8 @@ class _PlayScreenState extends State<PlayScreen> {
               _PlayGameButton(
                 onPressed: () => setState(() => _isAnswerRevealed = true),
                 label: 'Show Answer',
+                compact: compact,
+                compactSmall: compactSmall,
                 icon: Icons.visibility,
                 colors: const [Colors.orangeAccent, Colors.deepOrangeAccent],
               )
@@ -795,6 +945,8 @@ class _PlayScreenState extends State<PlayScreen> {
               _PlayGameButton(
                 onPressed: _startGame,
                 label: 'Next',
+                compact: compact,
+                compactSmall: compactSmall,
                 icon: Icons.skip_next,
                 colors: const [Colors.greenAccent, Colors.green],
               ),
@@ -809,12 +961,16 @@ class _PlayGameButton extends StatefulWidget {
   final String label;
   final IconData icon;
   final List<Color> colors;
+  final bool compact;
+  final bool compactSmall;
 
   const _PlayGameButton({
     required this.onPressed,
     required this.label,
     required this.icon,
     required this.colors,
+    this.compact = false,
+    this.compactSmall = false,
   });
 
   @override
@@ -836,7 +992,9 @@ class _PlayGameButtonState extends State<_PlayGameButton> {
       child: Transform(
         transform: Matrix4.skewX(-0.1),
         child: SizedBox(
-          height: 64,
+          height: widget.compact
+              ? (widget.compactSmall ? 44.0 : 46.0)
+              : 64.0,
           child: Stack(
             children: [
               Positioned(
@@ -884,17 +1042,40 @@ class _PlayGameButtonState extends State<_PlayGameButton> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(widget.icon, color: Colors.white, size: 24),
-                          const SizedBox(width: 8),
-                          Text(
-                            widget.label.toUpperCase(),
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w900,
-                              letterSpacing: 2.0,
-                              color: Colors.white,
-                            ),
+                          Icon(
+                            widget.icon,
+                            color: Colors.white,
+                            size: widget.compact
+                                ? (widget.compactSmall ? 16.0 : 17.0)
+                                : 24.0,
                           ),
+                          SizedBox(width: widget.compact ? 5.0 : 8.0),
+                          if (widget.compact)
+                            Flexible(
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Text(
+                                  widget.label.toUpperCase(),
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontSize: widget.compactSmall ? 11.0 : 12.0,
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: 0.6,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            )
+                          else
+                            Text(
+                              widget.label.toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 2.0,
+                                color: Colors.white,
+                              ),
+                            ),
                         ],
                       ),
                     ),
