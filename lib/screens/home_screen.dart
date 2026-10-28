@@ -202,7 +202,60 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             // -----------------------------------------------------------------
             // Layout (Mobile vs Desktop)
             // -----------------------------------------------------------------
-            if (isMobile) {
+            // Compact landscape: on narrow phones a vertical menu requires
+            // scrolling, hiding the lower actions. Fit the mascot and all
+            // four buttons side-by-side within the available height.
+            if (!isPortrait &&
+                constraints.maxHeight < 650 &&
+                constraints.maxWidth >= 600) {
+              return SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  child: Column(
+                    children: [
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: titleWidget,
+                      ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: SizedBox(
+                                  width: 320,
+                                  height: 350,
+                                  child: mascotWidget,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              flex: 5,
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: SizedBox(
+                                  width: 400,
+                                  height: 380,
+                                  child: buttonsWidget,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            } else if (isMobile) {
               return SafeArea(
                 child: Center(
                   child: SingleChildScrollView(

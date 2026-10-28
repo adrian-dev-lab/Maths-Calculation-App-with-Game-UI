@@ -11,6 +11,8 @@ class TtsService {
 
   final FlutterTts _tts = FlutterTts();
   bool _initialized = false;
+  Future<void> _speechQueue = Future<void>.value();
+  int _speechGeneration = 0;
 
   /// Initialize TTS. Safe to call multiple times.
   Future<void> init() async {
@@ -128,8 +130,32 @@ class TtsService {
     }
   }
 
+  /// Speak a game number with ordered speech-rate configuration.
+  /// Does not block the game timer.
+  void speakNumber(String text, GameSpeed speed) {
+    final generation = _speechGeneration;
+
+    _speechQueue = _speechQueue.then<void>((_) async {
+      if (generation != _speechGeneration) return;
+
+      await init();
+
+      if (generation != _speechGeneration) return;
+
+      await setSpeechRate(speed);
+
+      if (generation != _speechGeneration) return;
+
+      final result = await _tts.speak(text);
+
+      debugPrint('[TtsService] speakNumber "$text" result=$result');
+    }).catchError((Object error, StackTrace stackTrace) {
+      debugPrint('[TtsService] speakNumber error: $error');
+    });
+  }
   /// Stop any ongoing speech. Fire-and-forget.
   void stop() {
+    _speechGeneration++;
     _doStop();
   }
 

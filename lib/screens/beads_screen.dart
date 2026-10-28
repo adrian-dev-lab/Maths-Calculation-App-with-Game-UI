@@ -224,53 +224,86 @@ class _BeadsScreenState extends State<BeadsScreen> {
 
 
 
-  Widget _buildSettingItem(IconData icon, String title, String value, Color iconBgColor, Color iconColor) {
+  Widget _buildSettingItem(
+    IconData icon,
+    String title,
+    String value,
+    Color iconBgColor,
+    Color iconColor, {
+    bool compact = false,
+    bool extraCompact = false,
+  }) {
     return Expanded(
       child: GestureDetector(
         onTap: _showSettings,
         behavior: HitTestBehavior.opaque,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+          padding: EdgeInsets.symmetric(
+            horizontal: extraCompact ? 5 : (compact ? 7 : 14),
+            vertical: extraCompact ? 3 : (compact ? 5 : 14),
+          ),
           decoration: BoxDecoration(
             color: const Color(0xFF1E143B), // Dark card background
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(extraCompact ? 10 : (compact ? 12 : 16)),
             border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
           ),
           child: Row(
             children: [
               Container(
-                width: 44,
-                height: 44,
+                width: extraCompact ? 26 : (compact ? 30 : 44),
+                height: extraCompact ? 26 : (compact ? 30 : 44),
                 decoration: BoxDecoration(
                   color: iconBgColor,
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(extraCompact ? 8 : (compact ? 9 : 14)),
                 ),
-                child: Icon(icon, color: iconColor, size: 24),
+                child: Icon(
+                  icon,
+                  color: iconColor,
+                  size: extraCompact ? 15 : (compact ? 17 : 24),
+                ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: extraCompact ? 4 : (compact ? 6 : 12)),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(color: Colors.white60, fontSize: 12, fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      value,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        title,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: Colors.white60,
+                          fontSize: extraCompact ? 8.5 : (compact ? 9.5 : 12),
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: compact ? 0 : 2),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        value,
+                        maxLines: 1,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: extraCompact ? 11.25 : (compact ? 12.5 : 16),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.keyboard_arrow_down, color: Colors.white54, size: 18),
+              SizedBox(width: extraCompact ? 1 : (compact ? 2 : 0)),
+              Icon(
+                Icons.keyboard_arrow_down,
+                color: Colors.white54,
+                size: extraCompact ? 12 : (compact ? 14 : 18),
+              ),
             ],
           ),
         ),
@@ -278,8 +311,202 @@ class _BeadsScreenState extends State<BeadsScreen> {
     );
   }
 
-  Widget _buildContent() {
+  // Compact landscape phones have enough horizontal room, but not enough
+  // vertical room for the tablet-style column of hero, settings, and Start.
+  // Keep the settings and Start visible together without altering gameplay.
+  Widget _buildLandscapePhoneIdle() {
+    final viewSize = MediaQuery.sizeOf(context);
+    final bool smallLandscapePhone =
+        viewSize.width < 620 || viewSize.height < 330;
+
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: smallLandscapePhone ? 720 : 840,
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: smallLandscapePhone ? 10 : 16,
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: smallLandscapePhone ? 6 : 5,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _ReadyFinalHero(
+                      maxHeight: smallLandscapePhone ? 122 : 154,
+                      mobileRedWood: true,
+                    ),
+                    SizedBox(height: smallLandscapePhone ? 3 : 7),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontSize: baseFontSize *
+                                (smallLandscapePhone ? 0.86 : 0.94),
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white70,
+                          ),
+                          children: const [
+                            TextSpan(text: 'Ready to '),
+                            TextSpan(
+                              text: 'start?',
+                              style: TextStyle(color: Color(0xFFB67BFF)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: smallLandscapePhone ? 8 : 16),
+              Expanded(
+                flex: smallLandscapePhone ? 5 : 7,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        _buildSettingItem(
+                          Icons.desktop_windows_rounded,
+                          'Display',
+                          '$sequenceLength',
+                          const Color(0xFF332066),
+                          const Color(0xFF8660EB),
+                          compact: true,
+                          extraCompact: smallLandscapePhone,
+                        ),
+                        SizedBox(width: smallLandscapePhone ? 6 : 8),
+                        _buildSettingItem(
+                          Icons.speed_rounded,
+                          'Speed',
+                          speed,
+                          const Color(0xFF1C423E),
+                          const Color(0xFF49DCA4),
+                          compact: true,
+                          extraCompact: smallLandscapePhone,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: smallLandscapePhone ? 5 : 6),
+                    Row(
+                      children: [
+                        _buildSettingItem(
+                          Icons.calculate_rounded,
+                          'Operation',
+                          operation,
+                          const Color(0xFF4C2A24),
+                          const Color(0xFFE28B36),
+                          compact: true,
+                          extraCompact: smallLandscapePhone,
+                        ),
+                        SizedBox(width: smallLandscapePhone ? 6 : 8),
+                        _buildSettingItem(
+                          Icons.view_stream_rounded,
+                          'Group',
+                          '$digitsCount Beads',
+                          const Color(0xFF45193B),
+                          const Color(0xFFE954B5),
+                          compact: true,
+                          extraCompact: smallLandscapePhone,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: smallLandscapePhone ? 7 : 9),
+                    Align(
+                      alignment: Alignment.center,
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: smallLandscapePhone ? 145 : 220,
+                        ),
+                        child: SizedBox(
+                          width: double.infinity,
+                          height: smallLandscapePhone ? 36 : 46,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFFFF5A6E),
+                                  Color(0xFFFF335C),
+                                ],
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFFFF3B66)
+                                      .withValues(alpha: 0.22),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
+                            child: ElevatedButton.icon(
+                              onPressed: _startFlash,
+                              icon: Icon(
+                                Icons.play_arrow_rounded,
+                                size: smallLandscapePhone ? 16 : 21,
+                              ),
+                              label: Text(
+                                'Start',
+                                style: TextStyle(
+                                  fontSize: smallLandscapePhone ? 12.5 : 15.5,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.8,
+                                ),
+                              ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.transparent,
+                                shadowColor: Colors.transparent,
+                                foregroundColor: Colors.white,
+                                elevation: 0,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: smallLandscapePhone ? 11 : 18,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildContent({double? availableHeight}) {
     if (currentState == FlashState.idle) {
+      final bool compact =
+          availableHeight != null && availableHeight < 850;
+      final bool veryCompact =
+          availableHeight != null && availableHeight < 540;
+      // Use the device short side instead of a raw height threshold so both
+      // normal and small landscape phones get the compact layout. Tablets keep
+      // the previously verified large-screen composition.
+      final viewSize = MediaQuery.sizeOf(context);
+      final compactPhoneLandscape =
+          viewSize.width > viewSize.height && viewSize.shortestSide < 600;
+      if (compactPhoneLandscape) {
+        return _buildLandscapePhoneIdle();
+      }
+      final double? heroMaxHeight = compact
+          ? (veryCompact
+              ? 105.0
+              : (availableHeight * 0.28).clamp(160.0, 220.0).toDouble())
+          : null;
       return Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 750),
@@ -288,31 +515,34 @@ class _BeadsScreenState extends State<BeadsScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 20),
+                SizedBox(height: compact ? 8 : 20),
                 // Decorative Abacus Icon Area
-                const _ReadyFinalHero(),
-                const SizedBox(height: 22),
+                _ReadyFinalHero(
+                  maxHeight: heroMaxHeight,
+                  mobileRedWood: true,
+                ),
+                SizedBox(height: compact ? 12 : 22),
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: RichText(
                     text: TextSpan(
                       style: TextStyle(
-                        fontSize: baseFontSize * 1.5,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
+                        fontSize: baseFontSize * 1.08,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white70,
                       ),
                       children: const [
                         TextSpan(text: 'Ready to '),
                         TextSpan(
                           text: 'start?',
-                          style: TextStyle(color: Color(0xFFA155FF)), // Bright purple
+                          style: TextStyle(color: Color(0xFFB67BFF)), // Bright purple
                         ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                const Text(
+                SizedBox(height: compact ? 10 : 16),
+                if (!veryCompact) const Text(
                   'Watch the bead patterns and\ncalculate mentally.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -321,7 +551,7 @@ class _BeadsScreenState extends State<BeadsScreen> {
                     height: 1.4,
                   ),
                 ),
-                const SizedBox(height: 40),
+                SizedBox(height: compact ? 14 : 40),
                 
                 // Settings Grid
                 // Settings Grid
@@ -346,7 +576,7 @@ class _BeadsScreenState extends State<BeadsScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: compact ? 10 : 16),
                     Row(
                       children: [
                         _buildSettingItem(
@@ -369,21 +599,26 @@ class _BeadsScreenState extends State<BeadsScreen> {
                   ],
                 ),
                 
-                const SizedBox(height: 40),
+                SizedBox(height: compact ? 14 : 40),
                 
-                // Start Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: Container(
+                // Start Button — large screens keep the same visual language,
+                // but use a shorter, slightly taller CTA for better proportion.
+                Align(
+                  alignment: Alignment.center,
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 460),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 64,
+                      child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(28),
                       gradient: const LinearGradient(
-                        colors: [Color(0xFFA155FF), Color(0xFF6B20FF)],
+                        colors: [Color(0xFFFF5A6E), Color(0xFFFF335C)],
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF6B20FF).withValues(alpha: 0.4),
+                          color: const Color(0xFFFF3B66).withValues(alpha: 0.22),
                           blurRadius: 16,
                           offset: const Offset(0, 8),
                         ),
@@ -417,8 +652,10 @@ class _BeadsScreenState extends State<BeadsScreen> {
                       ),
                     ),
                   ),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: compact ? 10 : 24),
               ],
             ),
           ),
@@ -583,7 +820,18 @@ class _BeadsScreenState extends State<BeadsScreen> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                child: _buildContent(),
+                // The body extends behind the AppBar, so give the idle
+                // controls a safe top offset. Other play states are unchanged.
+                padding: currentState == FlashState.idle
+                    ? ((MediaQuery.sizeOf(context).width >
+                                MediaQuery.sizeOf(context).height &&
+                            MediaQuery.sizeOf(context).height < 360)
+                        ? const EdgeInsets.only(top: 16, bottom: 4)
+                        : const EdgeInsets.only(top: 64, bottom: 12))
+                    : EdgeInsets.zero,
+                child: _buildContent(
+                  availableHeight: MediaQuery.sizeOf(context).height,
+                ),
               ),
             ),
           ),
@@ -607,6 +855,109 @@ class _BeadsQuestionView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final viewSize = MediaQuery.sizeOf(context);
+    // Keep the question and its action visible on short landscape phones.
+    // Tablet and portrait layouts remain unchanged.
+    if (viewSize.width > viewSize.height &&
+        viewSize.shortestSide < 600) {
+      return Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 780),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 52, 16, 10),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: 240,
+                        maxHeight: 165,
+                      ),
+                      child: AspectRatio(
+                        aspectRatio: 584 / 398,
+                        child: BeadsMysteryVisual(),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          'What is the answer?',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFFF8F5FF),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      const Text(
+                        'Calculate in your head.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFFC9BDD9),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 46,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(23),
+                            gradient: const LinearGradient(
+                              colors: [
+                                Color(0xFFAA4BFF),
+                                Color(0xFF8731FF),
+                                Color(0xFF5E28FF),
+                              ],
+                            ),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(25),
+                              onTap: onShowAnswer,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.visibility_outlined,
+                                      color: Colors.white, size: 20),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Show Answer',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenSize = MediaQuery.sizeOf(context);
@@ -802,6 +1153,59 @@ class _BeadsAnswerResult extends StatelessWidget {
           (match) => '${match[1]},',
         );
 
+        // On short landscape phones, fit the result and Play Again action
+        // side by side rather than hiding them below a tall hero.
+        if (screenSize.width > screenSize.height &&
+            screenSize.shortestSide < 600) {
+          return Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 780),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 52, 16, 10),
+                child: Row(
+                  children: [
+                    const Expanded(
+                      flex: 3,
+                      child: _ResultHero(compact: true),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Answer',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFFF6F1FF),
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          _AnswerCard(
+                            formattedAnswer: formattedAnswer,
+                            height: 104,
+                            answerFontSize: 60,
+                          ),
+                          const SizedBox(height: 12),
+                          SizedBox(
+                            width: double.infinity,
+                            child: _PrimaryGradientButton(
+                              height: 46,
+                              onPressed: onPlayAgain,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        }
+
         // Empty hero area for the exact trophy asset we will add later.
 
         return Center(
@@ -994,16 +1398,24 @@ class _AnswerCard extends StatelessWidget {
 // ============================================================
 
 class _ResultHero extends StatelessWidget {
-  const _ResultHero();
+  final bool compact;
+
+  const _ResultHero({this.compact = false});
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final availableWidth = constraints.maxWidth;
+        final availableHeight = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : availableWidth;
 
-        final heroSize =
-            (availableWidth * 0.60).clamp(250.0, 350.0);
+        final heroSize = compact
+            ? math.min(availableWidth * 0.78, availableHeight * 0.86)
+                .clamp(105.0, 175.0)
+                .toDouble()
+            : (availableWidth * 0.60).clamp(250.0, 350.0).toDouble();
 
         return SizedBox(
           width: double.infinity,
@@ -2722,7 +3134,13 @@ class _FacetedBeadPainter
 // ============================================================
 // EXACT FINAL HERO CODE
 class _ReadyFinalHero extends StatelessWidget {
-  const _ReadyFinalHero();
+  final double? maxHeight;
+  final bool mobileRedWood;
+
+  const _ReadyFinalHero({
+    this.maxHeight,
+    this.mobileRedWood = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -2732,8 +3150,11 @@ class _ReadyFinalHero extends StatelessWidget {
             ? constraints.maxWidth
             : MediaQuery.sizeOf(context).width;
 
-        final heroWidth =
-            (availableWidth * 0.88).clamp(260.0, 600.0);
+        final double normalHeroWidth =
+            (availableWidth * 0.88).clamp(260.0, 600.0).toDouble();
+        final double heroWidth = maxHeight == null
+            ? normalHeroWidth
+            : math.min(normalHeroWidth, maxHeight! / 0.57);
 
         final heroHeight = heroWidth * 0.57;
 
@@ -2846,15 +3267,298 @@ class _ReadyFinalHero extends StatelessWidget {
               // -----------------------------------------------
               Center(
                 child: SizedBox(
-                  width: heroWidth * 0.74,
-                  height: heroHeight * 0.75,
-                  child: const _FinalReadyAbacus(),
+                  width: heroWidth * (mobileRedWood ? 0.86 : 0.74),
+                  height: heroHeight * (mobileRedWood ? 0.84 : 0.75),
+                  child: mobileRedWood
+                      ? const _PhoneReadyAbacus()
+                      : const _FinalReadyAbacus(),
                 ),
               ),
             ],
           ),
         );
       },
+    );
+  }
+}
+
+
+// ============================================================
+// READY ABACUS — warm wood + red beads
+// Shared by phone and tablet idle layouts for one consistent visual language.
+// ============================================================
+
+class _PhoneReadyAbacus extends StatelessWidget {
+  const _PhoneReadyAbacus();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final w = constraints.maxWidth;
+        final h = constraints.maxHeight;
+        final radius = w * 0.075;
+        final frameDepth = (w * 0.035).clamp(7.0, 14.0);
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: [
+            Positioned(
+              left: w * 0.018,
+              top: h * 0.035,
+              right: 0,
+              bottom: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(radius),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFF9A4011),
+                      Color(0xFF6A250A),
+                      Color(0xFF3A1106),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.34),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 0,
+              top: 0,
+              right: w * 0.018,
+              bottom: h * 0.035,
+              child: Container(
+                padding: EdgeInsets.all(frameDepth),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(radius),
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(0xFFFFC36C),
+                      Color(0xFFF08A2A),
+                      Color(0xFFC85B16),
+                      Color(0xFF8D350D),
+                    ],
+                    stops: [0.0, 0.34, 0.70, 1.0],
+                  ),
+                  border: Border.all(
+                    color: const Color(0xFFFFD79A).withValues(alpha: 0.92),
+                    width: 1.6,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF8A24).withValues(alpha: 0.22),
+                      blurRadius: 14,
+                      spreadRadius: 1,
+                    ),
+                    BoxShadow(
+                      color: const Color(0xFF7D3BFF).withValues(alpha: 0.16),
+                      blurRadius: 18,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(radius * 0.62),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0xFF24081D),
+                        Color(0xFF120518),
+                        Color(0xFF08020D),
+                      ],
+                    ),
+                    border: Border.all(
+                      color: const Color(0xFF5D2113),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        left: w * 0.035,
+                        right: w * 0.035,
+                        top: h * 0.365,
+                        child: Container(
+                          height: (h * 0.085).clamp(6.0, 12.0),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(99),
+                            gradient: const LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Color(0xFFFFC069),
+                                Color(0xFFD76B1D),
+                                Color(0xFF8E330E),
+                              ],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.35),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: w * 0.055),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Expanded(child: _PhoneReadyColumn()),
+                            Expanded(child: _PhoneReadyColumn()),
+                            Expanded(child: _PhoneReadyColumn()),
+                            Expanded(child: _PhoneReadyColumn()),
+                            Expanded(child: _PhoneReadyColumn()),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _PhoneReadyColumn extends StatelessWidget {
+  const _PhoneReadyColumn();
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final h = constraints.maxHeight;
+        final columnWidth = constraints.maxWidth.isFinite
+            ? constraints.maxWidth
+            : 40.0;
+        final beadWidth = (columnWidth * 0.84).clamp(22.0, 42.0);
+        final beadHeight = (beadWidth * 0.50).clamp(13.0, 22.0);
+        final rodWidth = (columnWidth * 0.09).clamp(2.8, 4.8);
+
+        return SizedBox(
+          width: columnWidth,
+          height: h,
+          child: Stack(
+            alignment: Alignment.topCenter,
+            children: [
+              Positioned(
+                top: h * 0.04,
+                bottom: h * 0.045,
+                child: Container(
+                  width: rodWidth,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(99),
+                    gradient: const LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Color(0xFFFFD897),
+                        Color(0xFFD87A2C),
+                        Color(0xFF8F3D12),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: h * 0.055,
+                child: _PhoneReadyBead(width: beadWidth, height: beadHeight),
+              ),
+              Positioned(
+                top: h * 0.515,
+                child: _PhoneReadyBead(width: beadWidth, height: beadHeight),
+              ),
+              Positioned(
+                top: h * 0.675,
+                child: _PhoneReadyBead(width: beadWidth, height: beadHeight),
+              ),
+              Positioned(
+                top: h * 0.835,
+                child: _PhoneReadyBead(width: beadWidth, height: beadHeight),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _PhoneReadyBead extends StatelessWidget {
+  final double width;
+  final double height;
+
+  const _PhoneReadyBead({required this.width, required this.height});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(height * 0.72),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Color(0xFFFF7468),
+            Color(0xFFFF3038),
+            Color(0xFFD81324),
+            Color(0xFF8C0714),
+          ],
+          stops: [0.0, 0.32, 0.72, 1.0],
+        ),
+        border: Border.all(
+          color: const Color(0xFFFFA39E).withValues(alpha: 0.72),
+          width: 0.8,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFFFF2E45).withValues(alpha: 0.22),
+            blurRadius: 5,
+            spreadRadius: 0.4,
+          ),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.30),
+            blurRadius: 3,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            left: width * 0.15,
+            top: height * 0.10,
+            child: Container(
+              width: width * 0.30,
+              height: height * 0.20,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(99),
+                color: Colors.white.withValues(alpha: 0.42),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
